@@ -4,6 +4,7 @@ import { authMiddleware } from '../../middlewares/auth.middleware';
 import { authRateLimiter } from '../../middlewares/rateLimiter.middleware';
 import { validateBody } from '../../middlewares/validate.middleware';
 import { registerSchema, loginSchema } from './auth.schema';
+import { asyncHandler } from '../../shared/utils/asyncHandler';
 
 const router = Router();
 
@@ -55,7 +56,7 @@ router.post(
     '/register',
     authRateLimiter,
     validateBody(registerSchema),
-    authController.register.bind(authController)
+    asyncHandler(authController.register.bind(authController))
 );
 
 /**
@@ -102,7 +103,7 @@ router.post(
     '/login',
     authRateLimiter,
     validateBody(loginSchema),
-    authController.login.bind(authController)
+    asyncHandler(authController.login.bind(authController))
 );
 
 /**
@@ -131,6 +132,6 @@ router.post(
  *       401:
  *         description: Unauthorized
  */
-router.get('/me', authMiddleware, authController.me.bind(authController));
+router.get('/me', authMiddleware, asyncHandler(authController.me.bind(authController)));
 
 export default router;

@@ -4,13 +4,13 @@ import { logger } from '../shared/utils/logger';
 
 export const connectDB = async (): Promise<void> => {
     try {
-        const conn = await mongoose.connect(env.MONGODB_URI, {
+        await mongoose.connect(env.MONGODB_URI, {
             maxPoolSize: 10,
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 45000,
         });
 
-        logger.info({ host: conn.connection.host }, 'MongoDB connected successfully');
+        logger.info({ host: mongoose.connection.host }, 'MongoDB connected successfully');
     } catch (error) {
         if (error instanceof Error) {
             logger.error({ error: error.message, stack: error.stack }, 'MongoDB connection failed');

@@ -4,6 +4,7 @@ import { authMiddleware } from '../../middlewares/auth.middleware';
 import { requireRole } from '../../middlewares/role.middleware';
 import { validateParams } from '../../middlewares/validate.middleware';
 import { submissionIdSchema } from './admin.schema';
+import { asyncHandler } from '../../shared/utils/asyncHandler';
 
 const router = Router();
 
@@ -40,9 +41,7 @@ router.get(
     '/submissions/pending',
     authMiddleware,
     requireRole('admin'),
-    (req, res, next) => {
-        adminController.getPendingSubmissions(req, res, next);
-    }
+    asyncHandler(adminController.getPendingSubmissions.bind(adminController))
 );
 
 /**
@@ -95,9 +94,7 @@ router.post(
     authMiddleware,
     requireRole('admin'),
     validateParams(submissionIdSchema),
-    (req, res, next) => {
-        adminController.approveSubmission(req, res, next);
-    }
+    asyncHandler(adminController.approveSubmission.bind(adminController))
 );
 
 /**
@@ -143,9 +140,7 @@ router.post(
     authMiddleware,
     requireRole('admin'),
     validateParams(submissionIdSchema),
-    (req, res, next) => {
-        adminController.rejectSubmission(req, res, next);
-    }
+    asyncHandler(adminController.rejectSubmission.bind(adminController))
 );
 
 export default router;
