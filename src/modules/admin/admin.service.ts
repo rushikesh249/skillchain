@@ -13,6 +13,10 @@ import { logger } from '../../shared/utils/logger';
 
 const CONFIDENCE_THRESHOLD = 70;
 
+interface PopulatedDocument {
+    _id: string;
+}
+
 export class AdminService {
     async getPendingSubmissions(): Promise<ISubmission[]> {
         return submissionRepository.findPending();
@@ -38,11 +42,9 @@ export class AdminService {
         }
 
         // Safely extract IDs (handle populated vs unpopulated fields)
-        // validation: explicit cast to any to access _id if populated
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const studentId = (submission.studentId as any)._id || submission.studentId;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const skillId = (submission.skillId as any)._id || submission.skillId;
+        const studentId =
+            (submission.studentId as unknown as PopulatedDocument)._id || submission.studentId;
+        const skillId = (submission.skillId as unknown as PopulatedDocument)._id || submission.skillId;
 
         // Get student and skill details
         const student = await userRepository.findById(studentId.toString());
@@ -125,6 +127,7 @@ export class AdminService {
 
         await submissionRepository.updateStatus(submissionId, 'rejected');
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return (await submissionRepository.findById(submissionId))!;
     }
 }

@@ -40,7 +40,9 @@ router.get(
     '/submissions/pending',
     authMiddleware,
     requireRole('admin'),
-    adminController.getPendingSubmissions.bind(adminController)
+    (req, res, next) => {
+        adminController.getPendingSubmissions(req, res, next);
+    }
 );
 
 /**
@@ -93,7 +95,9 @@ router.post(
     authMiddleware,
     requireRole('admin'),
     validateParams(submissionIdSchema),
-    adminController.approveSubmission.bind(adminController)
+    (req, res, next) => {
+        adminController.approveSubmission(req, res, next);
+    }
 );
 
 /**
@@ -139,7 +143,9 @@ router.post(
     authMiddleware,
     requireRole('admin'),
     validateParams(submissionIdSchema),
-    adminController.rejectSubmission.bind(adminController)
+    (req, res, next) => {
+        adminController.rejectSubmission(req, res, next);
+    }
 );
 
 export default router;

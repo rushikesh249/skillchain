@@ -1,8 +1,8 @@
 import { z } from 'zod';
+import dotenv from 'dotenv';
 
 // Load dotenv
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-require('dotenv').config();
+dotenv.config();
 
 const envSchema = z.object({
     PORT: z

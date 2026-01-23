@@ -18,11 +18,14 @@ export const validate = (schemas: ValidateOptions) => {
             for (const target of targets) {
                 const schema = schemas[target];
                 if (schema) {
-                    const result = schema.safeParse(req[target]);
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const result = schema.safeParse((req as any)[target]);
                     if (!result.success) {
                         throw result.error;
                     }
-                    req[target] = result.data;
+                    // Safe assignment
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (req as any)[target] = result.data;
                 }
             }
 
