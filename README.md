@@ -115,6 +115,32 @@ docker-compose logs -f api
 docker-compose down
 ```
 
+## 💻 Frontend Setup
+
+### Installation
+
+```bash
+cd frontend
+npm install
+cp .env.example .env
+```
+
+### Configuration
+
+Edit `frontend/.env`:
+
+```env
+VITE_API_URL=http://localhost:3000/api
+```
+
+### Running Locally
+
+```bash
+npm run dev
+```
+
+Frontend starts at: `http://localhost:5173`
+
 ## 📖 API Documentation
 
 ### Swagger UI

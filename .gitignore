@@ -11,3 +11,7 @@ npm-debug.log*
 .vscode/
 *.swp
 *.swo
+
+# Simulation outputs
+*output.txt
+*_log.txt

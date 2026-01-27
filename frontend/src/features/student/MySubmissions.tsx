@@ -74,12 +74,19 @@ export const MySubmissions = () => {
                                                 ) : <span className="text-gray-300">-</span>}
                                             </td>
                                             <td className="p-6 align-middle">
-                                                <Badge variant={
-                                                    submission.status === 'verified' ? 'success' :
-                                                        submission.status === 'rejected' ? 'destructive' : 'warning'
-                                                } className="capitalize px-3 py-1">
-                                                    {submission.status}
-                                                </Badge>
+                                                <div className="flex flex-col gap-2">
+                                                    <Badge variant={
+                                                        submission.status === 'approved' || submission.status === 'verified' ? 'success' :
+                                                            submission.status === 'rejected' ? 'destructive' : 'warning'
+                                                    } className="capitalize px-3 py-1 w-fit">
+                                                        {submission.status === 'approved' ? 'Verified' : submission.status}
+                                                    </Badge>
+                                                    {submission.status === 'rejected' && submission.reviewNotes && (
+                                                        <span className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+                                                            Reason: {submission.reviewNotes}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))

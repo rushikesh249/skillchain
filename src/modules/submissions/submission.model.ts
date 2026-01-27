@@ -8,7 +8,14 @@ export interface ISubmission extends Document {
     githubRepoUrl: string;
     demoUrl?: string;
     leetcodeUsername?: string;
-    status: SubmissionStatus;
+    status: 'pending' | 'approved' | 'rejected' | 'verified'; // Keeping verified for back-compat if needed, but logic will use approved
+    reviewedBy?: mongoose.Types.ObjectId;
+    reviewedAt?: Date;
+    reviewNotes?: string;
+    isVisibleToEmployers: boolean;
+    blockchainStatus: 'not_started' | 'minted' | 'failed';
+    tokenId?: string;
+    transactionHash?: string;
     verificationReport: VerificationReport | null;
     confidenceScore: number;
     flags: string[];
@@ -48,18 +55,45 @@ const submissionSchema = new Schema<ISubmission>(
         },
         status: {
             type: String,
-            enum: ['pending', 'verified', 'rejected'],
+            enum: ['pending', 'verified', 'approved', 'rejected'],
             default: 'pending',
         },
+        reviewedBy: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        reviewedAt: {
+            type: Date,
+        },
+        reviewNotes: {
+            type: String,
+            trim: true,
+        },
+        isVisibleToEmployers: {
+            type: Boolean,
+            default: false,
+        },
+        blockchainStatus: {
+            type: String,
+            enum: ['not_started', 'minted', 'failed'],
+            default: 'not_started',
+        },
+        tokenId: {
+            type: String,
+            trim: true,
+        },
+        transactionHash: {
+            type: String,
+            trim: true,
+        },
         verificationReport: {
-            type: Schema.Types.Mixed,
+            type: Schema.Types.Mixed, // Or specific sub-schema
             default: null,
         },
         confidenceScore: {
             type: Number,
-            min: 0,
-            max: 100,
             default: 0,
+            index: true,
         },
         flags: {
             type: [String],

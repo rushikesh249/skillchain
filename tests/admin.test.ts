@@ -115,20 +115,21 @@ describe('Admin Module', () => {
     });
 
     describe('POST /api/admin/submissions/:id/approve', () => {
-        it('should approve submission and create credential', async () => {
+        it('should approve submission and make it visible', async () => {
             const response = await request(app)
                 .post(`/api/admin/submissions/${submissionId}/approve`)
                 .set('Authorization', `Bearer ${adminToken}`);
 
-            expect(response.status).toBe(201);
+            expect(response.status).toBe(200);
             expect(response.body.success).toBe(true);
-            expect(response.body.data.credentialId).toBeDefined();
-            expect(response.body.data.ipfsCid).toBe('bafybeimockedcid123');
-            expect(response.body.data.blockchainTxHash).toBe('demo_tx_hash_mock_123');
+            expect(response.body.data.status).toBe('approved');
+            expect(response.body.data.isVisibleToEmployers).toBe(true);
+            expect(response.body.data.reviewedBy).toBeDefined();
 
             // Verify submission status updated
             const submission = await Submission.findById(submissionId);
-            expect(submission!.status).toBe('verified');
+            expect(submission!.status).toBe('approved');
+            expect(submission!.isVisibleToEmployers).toBe(true);
         });
 
         it('should fail for non-existent submission', async () => {
@@ -140,7 +141,7 @@ describe('Admin Module', () => {
             expect(response.status).toBe(404);
         });
 
-        it('should fail to approve already verified submission', async () => {
+        it('should fail to approve already processed submission', async () => {
             // First approval
             await request(app)
                 .post(`/api/admin/submissions/${submissionId}/approve`)
@@ -156,13 +157,17 @@ describe('Admin Module', () => {
     });
 
     describe('POST /api/admin/submissions/:id/reject', () => {
-        it('should reject submission', async () => {
+        it('should reject submission with reason', async () => {
+            const reason = 'Not enough commits';
             const response = await request(app)
                 .post(`/api/admin/submissions/${submissionId}/reject`)
-                .set('Authorization', `Bearer ${adminToken}`);
+                .set('Authorization', `Bearer ${adminToken}`)
+                .send({ reason });
 
             expect(response.status).toBe(200);
             expect(response.body.data.status).toBe('rejected');
+            expect(response.body.data.reviewNotes).toBe(reason);
+            expect(response.body.data.isVisibleToEmployers).toBe(false);
         });
     });
 });

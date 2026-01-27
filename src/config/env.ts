@@ -18,8 +18,11 @@ const envSchema = z.object({
         .default('http://localhost:3000')
         .transform((val) => val.split(',').map((origin) => origin.trim())),
     GITHUB_TOKEN: z.string().optional(),
-    IPFS_TOKEN: z.string().optional(),
-    IPFS_GATEWAY: z.string().default('https://w3s.link/ipfs'),
+    // Pinata IPFS (REQUIRED for credential issuance)
+    PINATA_API_KEY: z.string().optional(),
+    PINATA_SECRET_API_KEY: z.string().optional(),
+    IPFS_GATEWAY: z.string().default('https://gateway.pinata.cloud/ipfs'),
+    // Blockchain
     RPC_URL: z.string().optional(),
     ISSUER_PRIVATE_KEY: z.string().optional(),
     CONTRACT_ADDRESS: z.string().optional(),

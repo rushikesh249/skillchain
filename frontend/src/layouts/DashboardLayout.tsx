@@ -95,14 +95,32 @@ export const DashboardLayout = () => {
                         Settings
                     </div>
                     <nav className="space-y-1">
-                        <button className="w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-                            <Settings className="mr-3 h-5 w-5 text-gray-400" />
+                        <Link
+                            to={`/${user?.role}/settings`}
+                            className={cn(
+                                "w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group relative overflow-hidden",
+                                location.pathname.includes('/settings')
+                                    ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                            )}
+                        >
+                            {location.pathname.includes('/settings') && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-indigo-600 rounded-r-full"></div>}
+                            <Settings className={cn("mr-3 h-5 w-5 transition-colors", location.pathname.includes('/settings') ? "text-indigo-600" : "text-gray-400 group-hover:text-gray-600")} />
                             Account Settings
-                        </button>
-                        <button className="w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-                            <HelpCircle className="mr-3 h-5 w-5 text-gray-400" />
+                        </Link>
+                        <Link
+                            to={`/${user?.role}/help`}
+                            className={cn(
+                                "w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group relative overflow-hidden",
+                                location.pathname.includes('/help')
+                                    ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                            )}
+                        >
+                            {location.pathname.includes('/help') && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-indigo-600 rounded-r-full"></div>}
+                            <HelpCircle className={cn("mr-3 h-5 w-5 transition-colors", location.pathname.includes('/help') ? "text-indigo-600" : "text-gray-400 group-hover:text-gray-600")} />
                             Help & Support
-                        </button>
+                        </Link>
                     </nav>
                 </div>
 

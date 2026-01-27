@@ -5,10 +5,11 @@ export interface InputProps
     extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
+    leftIcon?: React.ReactNode;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, type, label, error, id, ...props }, ref) => {
+    ({ className, type, label, error, leftIcon, id, ...props }, ref) => {
         return (
             <div className="w-full space-y-2">
                 {label && (
@@ -17,10 +18,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     </label>
                 )}
                 <div className="relative">
+                    {leftIcon && (
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                            {leftIcon}
+                        </div>
+                    )}
                     <input
                         type={type}
                         className={cn(
                             "flex h-12 w-full rounded-lg border border-gray-200 bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50",
+                            leftIcon && "pl-10",
                             error && "border-red-500 focus-visible:ring-red-500/20 focus-visible:border-red-500",
                             className
                         )}

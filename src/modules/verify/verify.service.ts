@@ -1,7 +1,6 @@
 import { credentialRepository } from '../credentials/credential.repository';
-import { ipfsService } from '../../services/ipfs/ipfs.service';
+import { ipfsService, CredentialNFTMetadata } from '../../services/ipfs/ipfs.service';
 import { NotFoundError } from '../../shared/errors/AppError';
-import { CertificatePayload } from '../../shared/types';
 
 interface VerifyResult {
     valid: boolean;
@@ -22,7 +21,7 @@ interface VerifyResult {
         slug: string;
         description?: string;
     };
-    certificate: CertificatePayload | null;
+    metadata: CredentialNFTMetadata | null;
 }
 
 export class VerifyService {
@@ -33,6 +32,8 @@ export class VerifyService {
             throw new NotFoundError('Credential not found');
         }
 
+        console.log('[DEBUG] VerifyService fetched credential:', JSON.stringify(credential, null, 2));
+
         const student = credential.studentId as unknown as { name: string; email: string };
         const skill = credential.skillId as unknown as {
             name: string;
@@ -40,12 +41,12 @@ export class VerifyService {
             description?: string;
         };
 
-        // Try to fetch certificate from IPFS
-        let certificate: CertificatePayload | null = null;
+        // Try to fetch NFT metadata from IPFS
+        let metadata: CredentialNFTMetadata | null = null;
         try {
-            certificate = await ipfsService.fetchCertificate(credential.ipfsUrl);
+            metadata = await ipfsService.fetchMetadata(credential.ipfsUrl);
         } catch {
-            // IPFS fetch failed, certificate will be null
+            // IPFS fetch failed, metadata will be null
         }
 
         return {
@@ -67,7 +68,7 @@ export class VerifyService {
                 slug: skill.slug,
                 description: skill.description,
             },
-            certificate,
+            metadata,
         };
     }
 }

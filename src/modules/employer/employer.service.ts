@@ -56,13 +56,15 @@ interface UnlockedProfile {
 }
 
 export class EmployerService {
-    async searchCandidates(input: SearchCandidatesInput): Promise<PaginatedResult<CandidateResult>> {
+    async searchCandidates(input: SearchCandidatesInput, employerId: string): Promise<PaginatedResult<CandidateResult & { isUnlocked: boolean }>> {
         const pagination = parsePaginationParams(input.page, input.limit);
         const minScore = input.minScore || 0;
 
         // Build aggregation pipeline
         const matchStage: Record<string, unknown> = {
-            score: { $gte: minScore },
+            confidenceScore: { $gte: minScore }, // Note: using confidenceScore from Submission
+            status: { $in: ['approved', 'verified'] },
+            isVisibleToEmployers: true,
         };
 
         if (input.skillSlug) {
@@ -83,7 +85,7 @@ export class EmployerService {
                     as: 'student',
                 },
             },
-            { $unwind: '$student' },
+            { $unwind: { path: '$student', preserveNullAndEmptyArrays: true } },
             {
                 $lookup: {
                     from: 'skills',
@@ -92,8 +94,9 @@ export class EmployerService {
                     as: 'skill',
                 },
             },
-            { $unwind: '$skill' },
-            { $sort: { score: -1 as const } },
+            { $unwind: { path: '$skill', preserveNullAndEmptyArrays: true } },
+            // Sort by score (descending) and then newest first
+            { $sort: { confidenceScore: -1 as const, reviewedAt: -1 as const } },
             {
                 $facet: {
                     data: [{ $skip: getSkipValue(pagination) }, { $limit: pagination.limit }],
@@ -102,30 +105,45 @@ export class EmployerService {
             },
         ];
 
-        const result = await Credential.aggregate(pipeline);
+        // Log the pipeline execution
+        console.log('Search Match Stage:', JSON.stringify(matchStage));
+        const result = await Submission.aggregate(pipeline);
+        console.log('Raw Aggregation Result length:', result[0]?.data?.length || 0);
+
         const data = result[0]?.data || [];
         const total = result[0]?.total[0]?.count || 0;
 
-        const candidates: CandidateResult[] = data.map(
+        // Fetch unlocked students for this employer
+        const unlocks = await employerUnlockLogRepository.findByEmployerId(employerId);
+        const unlockedStudentIds = new Set(unlocks.map(u => u.studentId.toString()));
+
+        // Filter out students that are already unlocked
+        const filteredData = data.filter((item: any) => {
+            const studentId = item.student?._id?.toString();
+            return studentId && !unlockedStudentIds.has(studentId);
+        });
+
+        const candidates = filteredData.map(
             (item: {
-                student: { _id: mongoose.Types.ObjectId; name: string };
-                skill: { _id: mongoose.Types.ObjectId; name: string; slug: string };
-                score: number;
-                credentialId: string;
-                issuedAt: Date;
+                student?: { _id: mongoose.Types.ObjectId; name: string };
+                skill?: { _id: mongoose.Types.ObjectId; name: string; slug: string };
+                confidenceScore: number;
+                _id: string; // Submission ID
+                reviewedAt: Date;
             }) => ({
                 student: {
-                    _id: item.student._id.toString(),
-                    name: item.student.name,
+                    _id: item.student?._id.toString() || 'unknown',
+                    name: item.student?.name || 'Unknown Student',
                 },
                 skill: {
-                    _id: item.skill._id.toString(),
-                    name: item.skill.name,
-                    slug: item.skill.slug,
+                    _id: item.skill?._id.toString() || 'unknown',
+                    name: item.skill?.name || 'Unknown Skill',
+                    slug: item.skill?.slug || 'unknown-skill',
                 },
-                score: item.score,
-                credentialId: item.credentialId,
-                issuedAt: item.issuedAt,
+                score: item.confidenceScore,
+                credentialId: 'pending_mint', // Placeholder until minted
+                issuedAt: item.reviewedAt || new Date(), // Use review date as issue date
+                isUnlocked: item.student?._id ? unlockedStudentIds.has(item.student._id.toString()) : false
             })
         );
 
@@ -157,8 +175,15 @@ export class EmployerService {
         }
 
         const credentials = await credentialRepository.findByStudentId(studentId);
-        if (credentials.length === 0) {
-            throw new ConflictError('Student has no verified credentials');
+
+        // Also check for approved submissions (for new no-blockchain flow)
+        const approvedSubmissions = await Submission.find({
+            studentId,
+            status: 'approved'
+        });
+
+        if (credentials.length === 0 && approvedSubmissions.length === 0) {
+            throw new ConflictError('Student has no verified credentials or approved submissions');
         }
 
         // Atomically decrement credits
@@ -185,7 +210,7 @@ export class EmployerService {
         const credentials = await credentialRepository.findByStudentId(studentId);
         const submissions = await Submission.find({
             studentId: new mongoose.Types.ObjectId(studentId),
-            status: 'verified',
+            status: { $in: ['verified', 'approved'] },
         }).populate('skillId', 'name');
 
         return {

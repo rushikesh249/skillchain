@@ -31,8 +31,16 @@ export const VerifyPage = () => {
         );
     }
 
-    // Adapt data if necessary
-    const credential = data;
+    // Adapt data - backend returns nested structure
+    const { credential: credData, student, skill } = data;
+
+    // Map to flat structure for easier access
+    const credential = {
+        ...credData,
+        studentName: student.name,
+        skillName: skill.name,
+        confidenceScore: credData.score,
+    };
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-12">
@@ -51,18 +59,18 @@ export const VerifyPage = () => {
                         <div className="p-4 bg-gray-50 rounded-lg">
                             <p className="text-sm text-gray-500 mb-1">Confidence Score</p>
                             <div className="flex items-baseline">
-                                <span className="text-3xl font-bold text-gray-900">{credential.confidenceScore || credential.score}</span>
+                                <span className="text-3xl font-bold text-gray-900">{credential.score}</span>
                                 <span className="text-sm text-gray-400 ml-1">/ 100</span>
                             </div>
                         </div>
                         <div className="p-4 bg-gray-50 rounded-lg">
                             <p className="text-sm text-gray-500 mb-1">Issue Date</p>
                             <p className="text-lg font-medium text-gray-900">
-                                {new Date(credential.issuedAt || credential.createdAt).toLocaleDateString(undefined, {
+                                {credential.issuedAt ? new Date(credential.issuedAt).toLocaleDateString(undefined, {
                                     year: 'numeric',
                                     month: 'long',
                                     day: 'numeric'
-                                })}
+                                }) : 'N/A'}
                             </p>
                         </div>
                     </div>
@@ -81,7 +89,14 @@ export const VerifyPage = () => {
                             {credential.blockchainTxHash ? (
                                 <div className="p-3 rounded-lg border border-gray-200 bg-gray-50 break-all text-xs font-mono text-gray-600">
                                     <span className="block text-gray-400 mb-1 uppercase tracking-wide text-[10px]">Transaction Hash</span>
-                                    {credential.blockchainTxHash}
+                                    <a
+                                        href={`https://sepolia.etherscan.io/tx/${credential.blockchainTxHash}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        {credential.blockchainTxHash}
+                                    </a>
                                 </div>
                             ) : (
                                 <p className="text-sm text-gray-500 italic">Blockchain minting pending or skipped.</p>

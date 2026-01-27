@@ -22,13 +22,22 @@ export const PendingSubmissions = () => {
         mutationFn: (id: string) => api.post(`/admin/submissions/${id}/approve`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-pending'] });
+            alert('Submission verified and visible to employers');
+        },
+        onError: () => {
+            alert('Failed to approve');
         }
     });
 
     const rejectMutation = useMutation({
-        mutationFn: (id: string) => api.post(`/admin/submissions/${id}/reject`),
+        mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+            api.post(`/admin/submissions/${id}/reject`, { reason }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-pending'] });
+            alert('Submission rejected');
+        },
+        onError: () => {
+            alert('Failed to reject');
         }
     });
 
@@ -77,11 +86,11 @@ export const PendingSubmissions = () => {
                                     submissions?.map((submission: any) => (
                                         <tr key={submission._id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="p-6 align-middle">
-                                                <div className="font-semibold text-gray-900">{submission.studentId.name}</div>
-                                                <div className="text-xs text-gray-500">{submission.studentId.email}</div>
+                                                <div className="font-semibold text-gray-900">{submission.studentId?.name || 'Unknown Student'}</div>
+                                                <div className="text-xs text-gray-500">{submission.studentId?.email || 'N/A'}</div>
                                             </td>
                                             <td className="p-6 align-middle">
-                                                <Badge variant="neutral" className="bg-gray-100 text-gray-700 border-0">{submission.skillId.name}</Badge>
+                                                <Badge variant="neutral" className="bg-gray-100 text-gray-700 border-0">{submission.skillId?.name || 'Unknown Skill'}</Badge>
                                             </td>
                                             <td className="p-6 align-middle space-y-2">
                                                 <a href={submission.githubRepoUrl} target="_blank" className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 text-xs font-medium bg-indigo-50 px-2 py-1 rounded w-fit">
@@ -98,7 +107,7 @@ export const PendingSubmissions = () => {
                                                     <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
                                                         <div className={`h-full rounded-full ${submission.confidenceScore >= 80 ? 'bg-green-500' : 'bg-yellow-500'}`} style={{ width: `${submission.confidenceScore}%` }}></div>
                                                     </div>
-                                                    <span className="text-xs font-bold">{submission.confidenceScore}%</span>
+                                                    <span className="text-xs font-bold">{submission.confidenceScore ?? 0}%</span>
                                                 </div>
                                             </td>
                                             <td className="p-6 align-middle text-xs text-gray-500">
@@ -110,8 +119,13 @@ export const PendingSubmissions = () => {
                                                         size="sm"
                                                         variant="ghost"
                                                         className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                                                        isLoading={rejectMutation.isPending && rejectMutation.variables === submission._id}
-                                                        onClick={() => rejectMutation.mutate(submission._id)}
+                                                        isLoading={rejectMutation.isPending && rejectMutation.variables?.id === submission._id}
+                                                        onClick={() => {
+                                                            const reason = prompt('Enter rejection reason:');
+                                                            if (reason) {
+                                                                rejectMutation.mutate({ id: submission._id, reason });
+                                                            }
+                                                        }}
                                                         disabled={approveMutation.isPending}
                                                     >
                                                         Reject

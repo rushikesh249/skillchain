@@ -108,20 +108,18 @@ export const SubmitSkill = () => {
                                         placeholder="https://github.com/username/project"
                                         {...register('githubRepoUrl')}
                                         error={errors.githubRepoUrl?.message}
-                                        className="pl-10"
+                                        leftIcon={<Github className="h-5 w-5 text-gray-400" />}
                                     />
-                                    <Github className="absolute left-3 top-[34px] h-5 w-5 text-gray-400" />
                                 </div>
 
-                                <div className="relative">
+                                <div>
                                     <Input
                                         label="Live Demo URL (Optional)"
                                         placeholder="https://myproject.com"
                                         {...register('demoUrl')}
                                         error={errors.demoUrl?.message}
-                                        className="pl-10"
+                                        leftIcon={<Globe className="h-5 w-5 text-gray-400" />}
                                     />
-                                    <Globe className="absolute left-3 top-[34px] h-5 w-5 text-gray-400" />
                                 </div>
                             </div>
 

@@ -15,8 +15,9 @@ export class AdminController {
     async approveSubmission(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id } = req.params;
-            const credential = await adminService.approveSubmission(id);
-            sendCreated(res, credential, 'Submission approved and credential issued');
+            const adminId = req.user!.id;
+            const submission = await adminService.approveSubmission(id, adminId);
+            sendSuccess(res, submission, 'Submission approved successfully');
         } catch (error) {
             next(error);
         }
@@ -25,7 +26,10 @@ export class AdminController {
     async rejectSubmission(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id } = req.params;
-            const submission = await adminService.rejectSubmission(id);
+            const adminId = req.user!.id;
+            const { reason } = req.body; // Expect simplified reason field
+
+            const submission = await adminService.rejectSubmission(id, adminId, reason || 'No reason provided');
             sendSuccess(res, submission, 'Submission rejected');
         } catch (error) {
             next(error);

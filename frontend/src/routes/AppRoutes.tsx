@@ -20,6 +20,10 @@ import { UnlockedProfiles } from '../features/employer/UnlockedProfiles';
 
 import { PendingSubmissions } from '../features/admin/PendingSubmissions';
 
+// Common
+import { CommonSettings } from '../components/common/CommonSettings';
+import { CommonHelp } from '../components/common/CommonHelp';
+
 export const AppRoutes = () => {
     return (
         <Routes>
@@ -41,17 +45,23 @@ export const AppRoutes = () => {
                         <Route path="submissions/new" element={<SubmitSkill />} />
                         <Route path="submissions/my" element={<MySubmissions />} />
                         <Route path="credentials/my" element={<MyCredentials />} />
+                        <Route path="student/settings" element={<CommonSettings />} />
+                        <Route path="student/help" element={<CommonHelp />} />
                     </Route>
 
                     {/* Employer Routes */}
                     <Route element={<RoleBasedRoute allowedRoles={['employer']} />}>
                         <Route path="employer/search" element={<SearchCandidates />} />
                         <Route path="employer/unlocks" element={<UnlockedProfiles />} />
+                        <Route path="employer/settings" element={<CommonSettings />} />
+                        <Route path="employer/help" element={<CommonHelp />} />
                     </Route>
 
                     {/* Admin Routes */}
                     <Route element={<RoleBasedRoute allowedRoles={['admin']} />}>
                         <Route path="admin/submissions" element={<PendingSubmissions />} />
+                        <Route path="admin/settings" element={<CommonSettings />} />
+                        <Route path="admin/help" element={<CommonHelp />} />
                     </Route>
 
                 </Route>

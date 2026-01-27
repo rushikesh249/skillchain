@@ -1,68 +1,155 @@
 import axios from 'axios';
 import { env } from '../../config/env';
-import { CertificatePayload, IpfsUploadResult } from '../../shared/types';
 import { logger } from '../../shared/utils/logger';
 
+/**
+ * NFT Metadata format for credential
+ */
+export interface CredentialNFTMetadata {
+    name: string;
+    description: string;
+    image?: string;
+    attributes: Array<{
+        trait_type: string;
+        value: string | number;
+    }>;
+}
+
+/**
+ * Result of IPFS upload
+ */
+export interface IpfsUploadResult {
+    cid: string;
+    url: string;
+    metadataUrl: string;
+}
+
+/**
+ * IPFS Service using Pinata for REAL uploads
+ * NO STUB/FAKE CIDs - fails if upload fails
+ */
 export class IpfsService {
-    private isConfigured(): boolean {
-        return !!env.IPFS_TOKEN;
+    private apiKey: string | undefined;
+    private secretApiKey: string | undefined;
+    private gateway: string;
+
+    constructor() {
+        this.apiKey = env.PINATA_API_KEY;
+        this.secretApiKey = env.PINATA_SECRET_API_KEY;
+        this.gateway = env.IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs';
+
+        if (this.apiKey && this.secretApiKey) {
+            logger.info('Pinata IPFS client initialized');
+        } else {
+            logger.warn('Pinata API keys not configured - IPFS uploads will fail');
+        }
     }
 
-    async uploadCertificate(payload: CertificatePayload): Promise<IpfsUploadResult> {
+    /**
+     * Check if IPFS (Pinata) is properly configured
+     */
+    isConfigured(): boolean {
+        return !!(this.apiKey && this.secretApiKey);
+    }
+
+    /**
+     * Upload credential metadata to IPFS via Pinata
+     * @throws Error if upload fails - NO FALLBACK
+     */
+    async uploadMetadata(metadata: CredentialNFTMetadata): Promise<IpfsUploadResult> {
         if (!this.isConfigured()) {
-            // Return stub for hackathon/demo mode
-            const stubCid = `bafybeistub${Date.now()}${Math.random().toString(36).substring(7)}`;
-            logger.info({ credentialId: payload.credentialId }, 'IPFS not configured, returning stub CID');
-            return {
-                cid: stubCid,
-                url: `${env.IPFS_GATEWAY}/${stubCid}`,
-            };
+            throw new Error('IPFS not configured: PINATA_API_KEY and PINATA_SECRET_API_KEY are missing in .env');
         }
 
         try {
-            // Using web3.storage API
-            const blob = new Blob([JSON.stringify(payload, null, 2)], {
-                type: 'application/json',
-            });
+            logger.info({ metadata }, 'Uploading metadata to IPFS via Pinata...');
 
-            const formData = new FormData();
-            formData.append('file', blob, `${payload.credentialId}.json`);
-
-            const response = await axios.post<{ cid: string }>(
-                'https://api.web3.storage/upload',
-                formData,
+            const response = await axios.post(
+                'https://api.pinata.cloud/pinning/pinJSONToIPFS',
+                metadata,
                 {
                     headers: {
-                        Authorization: `Bearer ${env.IPFS_TOKEN}`,
+                        'Content-Type': 'application/json',
+                        'pinata_api_key': this.apiKey!,
+                        'pinata_secret_api_key': this.secretApiKey!,
                     },
                     timeout: 30000,
                 }
             );
 
-            const cid = response.data.cid;
-            const url = `${env.IPFS_GATEWAY}/${cid}`;
+            const cid = response.data.IpfsHash;
 
-            logger.info({ credentialId: payload.credentialId, cid }, 'Certificate uploaded to IPFS');
+            // Validate CID format
+            if (!cid || typeof cid !== 'string' || cid.length < 10) {
+                throw new Error(`Invalid CID returned from Pinata: ${cid}`);
+            }
 
-            return { cid, url };
-        } catch (error) {
-            logger.error({ error, credentialId: payload.credentialId }, 'Failed to upload to IPFS');
+            const url = `${this.gateway}/${cid}`;
+            const metadataUrl = `ipfs://${cid}`;
 
-            // Fallback to stub if upload fails
-            const stubCid = `bafybeistub${Date.now()}${Math.random().toString(36).substring(7)}`;
+            logger.info({ cid, url }, 'Metadata uploaded to IPFS via Pinata successfully');
+
             return {
-                cid: stubCid,
-                url: `${env.IPFS_GATEWAY}/${stubCid}`,
+                cid,
+                url,
+                metadataUrl,
             };
+        } catch (error) {
+            logger.error({ error }, 'Failed to upload metadata to Pinata IPFS');
+
+            if (axios.isAxiosError(error)) {
+                const message = error.response?.data?.error || error.message;
+                throw new Error(`Credential issuance failed: IPFS upload unsuccessful - ${message}`);
+            }
+
+            throw new Error(`Credential issuance failed: IPFS upload unsuccessful - ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
 
-    async fetchCertificate(ipfsUrl: string): Promise<CertificatePayload | null> {
+    /**
+     * Build NFT metadata from credential data
+     */
+    buildCredentialMetadata(data: {
+        studentName: string;
+        skillName: string;
+        skillSlug: string;
+        score: number;
+        issuedAt: string;
+        issuer: string;
+        credentialId: string;
+    }): CredentialNFTMetadata {
+        return {
+            name: `${data.skillName} Credential`,
+            description: `This NFT certifies that ${data.studentName} has demonstrated proficiency in ${data.skillName}. Issued by ${data.issuer} on ${new Date(data.issuedAt).toLocaleDateString()}.`,
+            attributes: [
+                { trait_type: 'Student', value: data.studentName },
+                { trait_type: 'Skill', value: data.skillSlug },
+                { trait_type: 'Score', value: data.score },
+                { trait_type: 'Issued At', value: data.issuedAt },
+                { trait_type: 'Issuer', value: data.issuer },
+                { trait_type: 'Credential ID', value: data.credentialId },
+            ],
+        };
+    }
+
+    /**
+     * Fetch metadata from IPFS via Pinata gateway
+     */
+    async fetchMetadata(ipfsUrl: string): Promise<CredentialNFTMetadata | null> {
         try {
-            const response = await axios.get<CertificatePayload>(ipfsUrl, { timeout: 10000 });
+            // Convert ipfs:// URL to HTTP gateway URL if needed
+            let httpUrl = ipfsUrl;
+            if (ipfsUrl.startsWith('ipfs://')) {
+                const cid = ipfsUrl.replace('ipfs://', '');
+                httpUrl = `${this.gateway}/${cid}`;
+            }
+
+            const response = await axios.get<CredentialNFTMetadata>(httpUrl, {
+                timeout: 15000
+            });
             return response.data;
         } catch (error) {
-            logger.error({ error, ipfsUrl }, 'Failed to fetch from IPFS');
+            logger.error({ error, ipfsUrl }, 'Failed to fetch metadata from IPFS');
             return null;
         }
     }

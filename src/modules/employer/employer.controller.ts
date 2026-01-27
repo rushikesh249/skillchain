@@ -6,8 +6,9 @@ import { SearchCandidatesInput } from './employer.schema';
 export class EmployerController {
     async searchCandidates(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            const employerId = req.user!.id;
             const input = req.query as unknown as SearchCandidatesInput;
-            const result = await employerService.searchCandidates(input);
+            const result = await employerService.searchCandidates(input, employerId);
             sendSuccess(res, result, 'Candidates retrieved successfully');
         } catch (error) {
             next(error);

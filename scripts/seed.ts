@@ -36,8 +36,12 @@ const seed = async (): Promise<void> => {
         console.log('✅ Connected to MongoDB');
 
         // Clear existing data (optional - comment out in production)
-        console.log('🧹 Clearing existing skills...');
+        console.log('🧹 Clearing existing data...');
         await Skill.deleteMany({});
+        // Clear dependent collections to avoid orphans
+        await mongoose.connection.collection('submissions').deleteMany({});
+        await mongoose.connection.collection('credentials').deleteMany({});
+        await mongoose.connection.collection('employerunlocklogs').deleteMany({});
 
         // Seed skills
         console.log('📚 Seeding skills...');
@@ -53,17 +57,17 @@ const seed = async (): Promise<void> => {
 
         // Create admin user
         console.log('👤 Creating admin user...');
-        const adminEmail = 'admin@skillchain.io';
+        const adminEmail = 'admin@demo.com';
         const existingAdmin = await User.findOne({ email: adminEmail });
         if (!existingAdmin) {
-            const adminPasswordHash = await hashPassword('Admin@123456');
+            const adminPasswordHash = await hashPassword('password123');
             await User.create({
                 name: 'SkillChain Admin',
                 email: adminEmail,
                 passwordHash: adminPasswordHash,
                 role: 'admin',
             });
-            console.log(`  ✅ Created admin: ${adminEmail} (password: Admin@123456)`);
+            console.log(`  ✅ Created admin: ${adminEmail} (password: password123)`);
         } else {
             console.log(`  ⏭️  Admin exists: ${adminEmail}`);
         }

@@ -27,14 +27,15 @@ export interface VerificationResult {
 }
 
 export interface CertificatePayload {
-    credentialId: string;
+    credentialId?: string; // Optional because we might mint it before knowing ID
     studentName: string;
-    studentEmail: string;
+    studentEmail?: string; // Optional
     skillName: string;
-    githubRepoUrl: string;
-    demoUrl?: string;
-    confidenceScore: number;
-    flags: string[];
+    skillSlug?: string; // Added for indexing/search
+    githubRepoUrl?: string;
+    score?: number; // Normalized field
+    confidenceScore?: number;
+    flags?: string[];
     issuedAt: string;
     issuer: string;
 }
@@ -42,6 +43,7 @@ export interface CertificatePayload {
 export interface IpfsUploadResult {
     cid: string;
     url: string;
+    metadataUrl: string;
 }
 
 export interface BlockchainMintParams {
