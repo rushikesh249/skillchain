@@ -22,7 +22,6 @@ export class AdminService {
     }
 
     async approveSubmission(submissionId: string, adminId: string): Promise<ISubmission> {
-        console.log(`[DEBUG] approveSubmission called for ${submissionId} by ${adminId}`);
         const submission = await submissionRepository.findById(submissionId);
         if (!submission) {
             throw new NotFoundError('Submission not found');
@@ -33,7 +32,6 @@ export class AdminService {
         }
 
         // 1. Fetch related data
-        console.log('[DEBUG] Fetching student/skill data');
 
         // Handle populated fields safely
         const studentId = (submission.studentId as any)._id
@@ -53,7 +51,6 @@ export class AdminService {
         }
 
         // 2. Upload NFT Metadata to IPFS - MUST SUCCEED OR FAIL COMPLETELY
-        console.log('[DEBUG] Uploading NFT metadata to IPFS');
 
         // Check if IPFS is configured
         if (!ipfsService.isConfigured()) {
@@ -71,6 +68,7 @@ export class AdminService {
         // Build NFT metadata in standard format
         const nftMetadata = ipfsService.buildCredentialMetadata({
             studentName: student.name,
+            studentWallet: student.walletAddress,
             skillName: skill.name,
             skillSlug: skill.slug,
             score: submission.confidenceScore,
@@ -89,10 +87,8 @@ export class AdminService {
             ipfsCid = ipfsResult.cid;
             ipfsUrl = ipfsResult.url;
             metadataUrl = ipfsResult.metadataUrl;
-            console.log(`[DEBUG] IPFS Success: ${ipfsCid}`);
             logger.info({ ipfsCid, ipfsUrl }, 'NFT metadata uploaded to IPFS');
         } catch (error) {
-            console.error('[DEBUG] IPFS Error:', error);
             logger.error({ error, submissionId }, 'IPFS upload failed - credential issuance aborted');
             // NO FALLBACK - FAIL COMPLETELY
             throw new AppError(
@@ -103,7 +99,6 @@ export class AdminService {
         }
 
         // 3. Mint Credential on Blockchain
-        console.log('[DEBUG] Minting on Blockchain');
         let txHash = '';
         let blockchainStatus: 'minted' | 'failed' = 'failed';
 
@@ -115,9 +110,7 @@ export class AdminService {
                 ipfsCid: metadataUrl, // Use ipfs:// URL for on-chain storage
             });
             blockchainStatus = 'minted';
-            console.log(`[DEBUG] Minting Success: ${txHash}`);
         } catch (error) {
-            console.error('[DEBUG] Minting Error:', error);
             logger.error({ error, submissionId }, 'Blockchain minting failed');
             blockchainStatus = 'failed';
             // Use a demo hash if minting fails to verify the flow
@@ -125,8 +118,12 @@ export class AdminService {
         }
 
         // 4. Create Credential Record
-        console.log('[DEBUG] Creating Credential Record');
         try {
+            // Calculate Hash (Integrity Layer)
+            // Calculate Hash (Integrity Layer)
+            // We hash the exact metadata object that was uploaded to IPFS
+            const certificateHash = blockchainService.calculateHash(nftMetadata);
+
             await credentialRepository.create({
                 studentId: studentId,
                 skillId: skillId,
@@ -136,10 +133,9 @@ export class AdminService {
                 blockchainTxHash: txHash,
                 credentialId: credentialId, // ✅ Use the same ID we generated earlier
                 score: submission.confidenceScore,
+                certificateHash,
             });
-            console.log('[DEBUG] Credential Record Created');
         } catch (dbError) {
-            console.error('[DEBUG] DB Error:', dbError);
             throw dbError;
         }
 

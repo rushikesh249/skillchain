@@ -127,11 +127,19 @@ cp .env.example .env
 
 ### Configuration
 
-Edit `frontend/.env`:
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
 
-```env
-VITE_API_URL=http://localhost:3000/api
-```
+2. Edit `frontend/.env` to set your API URL:
+   ```env
+   # Development
+   VITE_API_BASE_URL=http://localhost:3000/api
+
+   # Production
+   VITE_API_BASE_URL=https://your-backend.onrender.com/api
+   ```
 
 ### Running Locally
 

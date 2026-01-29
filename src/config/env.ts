@@ -15,12 +15,12 @@ const envSchema = z.object({
     JWT_EXPIRES_IN: z.string().default('7d'),
     CORS_ORIGINS: z
         .string()
-        .default('http://localhost:3000')
+        .default(process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'development' ? '*' : ''))
         .transform((val) => val.split(',').map((origin) => origin.trim())),
     GITHUB_TOKEN: z.string().optional(),
     // Pinata IPFS (REQUIRED for credential issuance)
-    PINATA_API_KEY: z.string().optional(),
-    PINATA_SECRET_API_KEY: z.string().optional(),
+    PINATA_API_KEY: z.string().min(1, 'PINATA_API_KEY is required for IPFS uploads'),
+    PINATA_SECRET_API_KEY: z.string().min(1, 'PINATA_SECRET_API_KEY is required for IPFS uploads'),
     IPFS_GATEWAY: z.string().default('https://gateway.pinata.cloud/ipfs'),
     // Blockchain
     RPC_URL: z.string().optional(),

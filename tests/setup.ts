@@ -13,17 +13,32 @@ import { Skill } from '../src/modules/skills/skill.model';
 let mongoServer: MongoMemoryServer;
 
 beforeAll(async () => {
+    // ⚡ SKIPPED FOR INTEGRITY CHECKS (Unit Tests Only)
+    if (expect.getState().testPath?.includes('integrity.test.ts')) {
+        return;
+    }
+
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
     await mongoose.connect(mongoUri);
 });
 
 afterAll(async () => {
+    if (expect.getState().testPath?.includes('integrity.test.ts')) {
+        return;
+    }
+
     await mongoose.disconnect();
-    await mongoServer.stop();
+    if (mongoServer) {
+        await mongoServer.stop();
+    }
 });
 
 beforeEach(async () => {
+    if (expect.getState().testPath?.includes('integrity.test.ts')) {
+        return;
+    }
+
     // ✅ Always start clean
     const collections = mongoose.connection.collections;
     for (const key of Object.keys(collections)) {

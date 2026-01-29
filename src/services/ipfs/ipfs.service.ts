@@ -57,34 +57,39 @@ export class IpfsService {
      * @throws Error if upload fails - NO FALLBACK
      */
     async uploadMetadata(metadata: CredentialNFTMetadata): Promise<IpfsUploadResult> {
-        if (!this.isConfigured()) {
-            throw new Error('IPFS not configured: PINATA_API_KEY and PINATA_SECRET_API_KEY are missing in .env');
+
+        if (!this.apiKey || !this.secretApiKey) {
+            throw new Error('Pinata API keys are not configured. Check PINATA_API_KEY and PINATA_SECRET_API_KEY in .env');
         }
 
         try {
-            logger.info({ metadata }, 'Uploading metadata to IPFS via Pinata...');
-
             const response = await axios.post(
                 'https://api.pinata.cloud/pinning/pinJSONToIPFS',
                 metadata,
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'pinata_api_key': this.apiKey!,
-                        'pinata_secret_api_key': this.secretApiKey!,
+                        'pinata_api_key': this.apiKey,
+                        'pinata_secret_api_key': this.secretApiKey,
                     },
                     timeout: 30000,
                 }
             );
 
+            if (!response.data || !response.data.IpfsHash) {
+                console.error('[IPFS] ERROR: No IpfsHash in response', response.data);
+                throw new Error('IPFS upload failed: No CID returned from Pinata');
+            }
+
             const cid = response.data.IpfsHash;
 
-            // Validate CID format
-            if (!cid || typeof cid !== 'string' || cid.length < 10) {
+            // Validate CID format (Basic check)
+            if (typeof cid !== 'string' || cid.length < 10) {
                 throw new Error(`Invalid CID returned from Pinata: ${cid}`);
             }
 
-            const url = `${this.gateway}/${cid}`;
+            // Force the gateway URL format to ensure no protocol issues
+            const url = `https://gateway.pinata.cloud/ipfs/${cid}`;
             const metadataUrl = `ipfs://${cid}`;
 
             logger.info({ cid, url }, 'Metadata uploaded to IPFS via Pinata successfully');
@@ -95,9 +100,11 @@ export class IpfsService {
                 metadataUrl,
             };
         } catch (error) {
+            console.error('[IPFS] Upload FAILED:', error);
             logger.error({ error }, 'Failed to upload metadata to Pinata IPFS');
 
             if (axios.isAxiosError(error)) {
+                console.error('[IPFS] Axios Error Details:', error.response?.data);
                 const message = error.response?.data?.error || error.message;
                 throw new Error(`Credential issuance failed: IPFS upload unsuccessful - ${message}`);
             }
@@ -111,6 +118,7 @@ export class IpfsService {
      */
     buildCredentialMetadata(data: {
         studentName: string;
+        studentWallet?: string;
         skillName: string;
         skillSlug: string;
         score: number;
@@ -118,17 +126,23 @@ export class IpfsService {
         issuer: string;
         credentialId: string;
     }): CredentialNFTMetadata {
+        const attributes = [
+            { trait_type: 'Student', value: data.studentName },
+            { trait_type: 'Skill', value: data.skillSlug },
+            { trait_type: 'Score', value: data.score },
+            { trait_type: 'Issued At', value: data.issuedAt },
+            { trait_type: 'Issuer', value: data.issuer },
+            { trait_type: 'Credential ID', value: data.credentialId },
+        ];
+
+        if (data.studentWallet) {
+            attributes.push({ trait_type: 'Student Wallet', value: data.studentWallet });
+        }
+
         return {
             name: `${data.skillName} Credential`,
             description: `This NFT certifies that ${data.studentName} has demonstrated proficiency in ${data.skillName}. Issued by ${data.issuer} on ${new Date(data.issuedAt).toLocaleDateString()}.`,
-            attributes: [
-                { trait_type: 'Student', value: data.studentName },
-                { trait_type: 'Skill', value: data.skillSlug },
-                { trait_type: 'Score', value: data.score },
-                { trait_type: 'Issued At', value: data.issuedAt },
-                { trait_type: 'Issuer', value: data.issuer },
-                { trait_type: 'Credential ID', value: data.credentialId },
-            ],
+            attributes,
         };
     }
 

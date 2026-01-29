@@ -10,6 +10,7 @@ export class CredentialRepository {
         ipfsUrl: string;
         blockchainTxHash: string | null;
         credentialId: string;
+        certificateHash: string;
     }): Promise<ICredential> {
         const credential = new Credential({
             studentId: new mongoose.Types.ObjectId(data.studentId),
@@ -19,6 +20,7 @@ export class CredentialRepository {
             ipfsUrl: data.ipfsUrl,
             blockchainTxHash: data.blockchainTxHash,
             credentialId: data.credentialId,
+            certificateHash: data.certificateHash,
             issuedAt: new Date(),
         });
         return credential.save();

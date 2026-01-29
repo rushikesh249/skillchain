@@ -4,7 +4,7 @@ import { Card, CardContent, CardTitle, CardHeader, CardFooter } from '../../comp
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { FullPageSpinner } from '../../components/ui/Spinner';
-import { User, Lock, Unlock, Search, Filter, AlertCircle, Github, Globe } from 'lucide-react';
+import { User, Lock, Unlock, Search, Filter, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { Badge } from '../../components/ui/Badge';
@@ -13,6 +13,7 @@ import { useDebounce } from '../../hooks/useDebounce';
 
 // Define types for better safety
 interface Candidate {
+    _id: string;
     student: {
         _id: string;
         name: string;
@@ -30,16 +31,6 @@ interface Candidate {
     // The search endpoint returns basic info + isUnlocked status.
     // The 'unlock' endpoint returns full profile.
     // But our search grid card needs to handle both states.
-}
-
-interface SearchResponse {
-    data: Candidate[];
-    pagination: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-    };
 }
 
 export const SearchCandidates = () => {

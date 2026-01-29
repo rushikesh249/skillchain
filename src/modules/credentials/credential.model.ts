@@ -9,6 +9,7 @@ export interface ICredential extends Document {
     ipfsUrl: string;
     blockchainTxHash: string | null;
     credentialId: string;
+    certificateHash: string;
     issuedAt: Date;
 }
 
@@ -51,6 +52,11 @@ const credentialSchema = new Schema<ICredential>(
             type: String,
             required: true,
             unique: true,
+        },
+        certificateHash: {
+            type: String,
+            required: true,
+            index: true,
         },
         issuedAt: {
             type: Date,

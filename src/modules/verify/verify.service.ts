@@ -2,8 +2,14 @@ import { credentialRepository } from '../credentials/credential.repository';
 import { ipfsService, CredentialNFTMetadata } from '../../services/ipfs/ipfs.service';
 import { NotFoundError } from '../../shared/errors/AppError';
 
+import { blockchainService } from '../../services/blockchain/blockchain.service';
+
 interface VerifyResult {
     valid: boolean;
+    hashMatch: boolean;
+    certificateHash: string;
+    ipfsCid: string;
+    issuedAt: Date;
     credential: {
         credentialId: string;
         score: number;
@@ -22,6 +28,7 @@ interface VerifyResult {
         description?: string;
     };
     metadata: CredentialNFTMetadata | null;
+    certificate?: any;
 }
 
 export class VerifyService {
@@ -32,7 +39,7 @@ export class VerifyService {
             throw new NotFoundError('Credential not found');
         }
 
-        console.log('[DEBUG] VerifyService fetched credential:', JSON.stringify(credential, null, 2));
+
 
         const student = credential.studentId as unknown as { name: string; email: string };
         const skill = credential.skillId as unknown as {
@@ -43,14 +50,35 @@ export class VerifyService {
 
         // Try to fetch NFT metadata from IPFS
         let metadata: CredentialNFTMetadata | null = null;
+        let certificate: any = null;
+        let recalculateHash = '';
+        let hashMatch = false;
+
         try {
             metadata = await ipfsService.fetchMetadata(credential.ipfsUrl);
-        } catch {
-            // IPFS fetch failed, metadata will be null
+            certificate = metadata; // Use the fetched metadata as the certificate payload
+
+            // Recalculate Hash
+            if (metadata) {
+                recalculateHash = blockchainService.calculateHash(metadata);
+            }
+
+            // Compare Hash
+            hashMatch = recalculateHash === credential.certificateHash;
+
+        } catch (err) {
+            // Verify continues even if IPFS fails, but hashMatch will be false
+            if (err instanceof Error) {
+                // Use logger here if needed or just silent
+            }
         }
 
         return {
             valid: true,
+            hashMatch,
+            certificateHash: credential.certificateHash,
+            ipfsCid: credential.ipfsCid,
+            issuedAt: credential.issuedAt,
             credential: {
                 credentialId: credential.credentialId,
                 score: credential.score,
@@ -69,6 +97,7 @@ export class VerifyService {
                 description: skill.description,
             },
             metadata,
+            certificate
         };
     }
 }

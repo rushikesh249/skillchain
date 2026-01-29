@@ -3,8 +3,10 @@ import { env } from '../../config/env';
 import { BlockchainMintParams } from '../../shared/types';
 import { logger } from '../../shared/utils/logger';
 import contractAbi from './abi/SkillChainSBT.json';
+import crypto from 'crypto';
 
 export class BlockchainService {
+
     private isConfigured(): boolean {
         const configured = !!(env.RPC_URL && env.ISSUER_PRIVATE_KEY && env.CONTRACT_ADDRESS);
         if (!configured) {
@@ -13,6 +15,24 @@ export class BlockchainService {
             if (!env.CONTRACT_ADDRESS) logger.warn('Blockchain: CONTRACT_ADDRESS not configured');
         }
         return configured;
+    }
+
+    private stableStringify(obj: any): string {
+        if (obj === null || typeof obj !== 'object') {
+            return JSON.stringify(obj);
+        }
+
+        if (Array.isArray(obj)) {
+            return `[${obj.map((i) => this.stableStringify(i)).join(',')}]`;
+        }
+
+        const keys = Object.keys(obj).sort();
+        return `{${keys.map((k) => `"${k}":${this.stableStringify(obj[k])}`).join(',')}}`;
+    }
+
+    calculateHash(payload: any): string {
+        const stableJson = this.stableStringify(payload);
+        return crypto.createHash('sha256').update(stableJson).digest('hex');
     }
 
     async mintCredential(params: BlockchainMintParams): Promise<string> {
