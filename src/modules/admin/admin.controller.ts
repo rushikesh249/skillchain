@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { adminService } from './admin.service';
-import { sendSuccess, sendCreated } from '../../shared/utils/response';
+import { sendSuccess } from '../../shared/utils/response';
 
 export class AdminController {
     async getPendingSubmissions(_req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -27,9 +27,10 @@ export class AdminController {
         try {
             const { id } = req.params;
             const adminId = req.user!.id;
-            const { reason } = req.body; // Expect simplified reason field
+            const body = req.body as { reason?: string };
+            const reason = body.reason || 'No reason provided';
 
-            const submission = await adminService.rejectSubmission(id, adminId, reason || 'No reason provided');
+            const submission = await adminService.rejectSubmission(id, adminId, reason);
             sendSuccess(res, submission, 'Submission rejected');
         } catch (error) {
             next(error);

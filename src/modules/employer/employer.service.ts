@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { Credential } from '../credentials/credential.model';
 import { Submission } from '../submissions/submission.model';
 import { skillRepository } from '../skills/skill.repository';
 import { userRepository } from '../user/user.repository';
@@ -105,10 +104,17 @@ export class EmployerService {
             },
         ];
 
-        // Log the pipeline execution
-        console.log('Search Match Stage:', JSON.stringify(matchStage));
-        const result = await Submission.aggregate(pipeline);
-        console.log('Raw Aggregation Result length:', result[0]?.data?.length || 0);
+        // Execute aggregation
+        const result = await Submission.aggregate(pipeline) as [{
+            data: Array<{
+                student?: { _id: mongoose.Types.ObjectId; name: string };
+                skill?: { _id: mongoose.Types.ObjectId; name: string; slug: string };
+                confidenceScore: number;
+                _id: string;
+                reviewedAt: Date;
+            }>;
+            total: Array<{ count: number }>;
+        }];
 
         const data = result[0]?.data || [];
         const total = result[0]?.total[0]?.count || 0;
@@ -117,35 +123,27 @@ export class EmployerService {
         const unlocks = await employerUnlockLogRepository.findByEmployerId(employerId);
         const unlockedStudentIds = new Set(unlocks.map(u => u.studentId.toString()));
 
-        // Filter out students that are already unlocked
-        const filteredData = data.filter((item: any) => {
+        // Filter out students that are already unlocked  
+        const filteredData = data.filter((item) => {
             const studentId = item.student?._id?.toString();
             return studentId && !unlockedStudentIds.has(studentId);
         });
 
-        const candidates = filteredData.map(
-            (item: {
-                student?: { _id: mongoose.Types.ObjectId; name: string };
-                skill?: { _id: mongoose.Types.ObjectId; name: string; slug: string };
-                confidenceScore: number;
-                _id: string; // Submission ID
-                reviewedAt: Date;
-            }) => ({
-                student: {
-                    _id: item.student?._id.toString() || 'unknown',
-                    name: item.student?.name || 'Unknown Student',
-                },
-                skill: {
-                    _id: item.skill?._id.toString() || 'unknown',
-                    name: item.skill?.name || 'Unknown Skill',
-                    slug: item.skill?.slug || 'unknown-skill',
-                },
-                score: item.confidenceScore,
-                credentialId: 'pending_mint', // Placeholder until minted
-                issuedAt: item.reviewedAt || new Date(), // Use review date as issue date
-                isUnlocked: item.student?._id ? unlockedStudentIds.has(item.student._id.toString()) : false
-            })
-        );
+        const candidates = filteredData.map((item) => ({
+            student: {
+                _id: item.student?._id.toString() || 'unknown',
+                name: item.student?.name || 'Unknown Student',
+            },
+            skill: {
+                _id: item.skill?._id.toString() || 'unknown',
+                name: item.skill?.name || 'Unknown Skill',
+                slug: item.skill?.slug || 'unknown-skill',
+            },
+            score: item.confidenceScore,
+            credentialId: 'pending_mint', // Placeholder until minted
+            issuedAt: item.reviewedAt || new Date(), // Use review date as issue date
+            isUnlocked: item.student?._id ? unlockedStudentIds.has(item.student._id.toString()) : false
+        }));
 
         return createPaginatedResult(candidates, total, pagination);
     }

@@ -28,7 +28,7 @@ interface VerifyResult {
         description?: string;
     };
     metadata: CredentialNFTMetadata | null;
-    certificate?: any;
+    certificate?: unknown;
 }
 
 export class VerifyService {
@@ -50,7 +50,7 @@ export class VerifyService {
 
         // Try to fetch NFT metadata from IPFS
         let metadata: CredentialNFTMetadata | null = null;
-        let certificate: any = null;
+        let certificate: unknown = null;
         let recalculateHash = '';
         let hashMatch = false;
 

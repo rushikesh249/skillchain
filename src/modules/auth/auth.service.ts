@@ -14,10 +14,11 @@ export class AuthService {
             role: user.role,
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return jwt.sign(payload as any, env.JWT_SECRET, {
-            expiresIn: env.JWT_EXPIRES_IN,
-        } as jwt.SignOptions);
+        const options: jwt.SignOptions = {
+            expiresIn: env.JWT_EXPIRES_IN as any, // Cast to any to satisfy the complex StringValue union from 'ms' library
+        };
+
+        return jwt.sign(payload as object, env.JWT_SECRET, options);
     }
 
     async register(input: RegisterInput): Promise<{ user: IUser; token: string }> {

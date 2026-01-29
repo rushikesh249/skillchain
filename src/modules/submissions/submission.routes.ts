@@ -4,6 +4,7 @@ import { authMiddleware } from '../../middlewares/auth.middleware';
 import { requireRole } from '../../middlewares/role.middleware';
 import { validateBody } from '../../middlewares/validate.middleware';
 import { createSubmissionSchema } from './submission.schema';
+import { asyncHandler } from '../../shared/utils/asyncHandler';
 
 const router = Router();
 
@@ -50,7 +51,7 @@ router.post(
     authMiddleware,
     requireRole('student'),
     validateBody(createSubmissionSchema),
-    submissionController.createSubmission.bind(submissionController)
+    asyncHandler(submissionController.createSubmission.bind(submissionController))
 );
 
 /**
@@ -87,7 +88,7 @@ router.get(
     '/my',
     authMiddleware,
     requireRole('student'),
-    submissionController.getMySubmissions.bind(submissionController)
+    asyncHandler(submissionController.getMySubmissions.bind(submissionController))
 );
 
 export default router;

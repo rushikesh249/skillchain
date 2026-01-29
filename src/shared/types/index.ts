@@ -75,11 +75,9 @@ export interface SearchCandidatesParams extends PaginationParams {
     minScore?: number;
 }
 
-declare global {
-    namespace Express {
-        interface Request {
-            user?: JwtPayload;
-            requestId?: string;
-        }
+declare module 'express' {
+    interface Request {
+        user?: JwtPayload;
+        requestId?: string;
     }
 }

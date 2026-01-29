@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { skillController } from './skill.controller';
+import { asyncHandler } from '../../shared/utils/asyncHandler';
 
 const router = Router();
 
@@ -27,6 +28,6 @@ const router = Router();
  *                   items:
  *                     $ref: '#/components/schemas/Skill'
  */
-router.get('/', skillController.getAllSkills.bind(skillController));
+router.get('/', asyncHandler(skillController.getAllSkills.bind(skillController)));
 
 export default router;

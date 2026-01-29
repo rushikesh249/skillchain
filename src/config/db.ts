@@ -15,12 +15,12 @@ export const connectDB = async (retries = 3): Promise<void> => {
             return;
         } catch (error) {
             retries -= 1;
-            console.error(`MongoDB connection failed. Retries left: ${retries}`);
+            logger.warn(`MongoDB connection failed. Retries left: ${retries}`);
             if (retries === 0) {
                 if (error instanceof Error) {
                     logger.error({ error: error.message, stack: error.stack }, 'MongoDB connection failed after retries');
                 } else {
-                    logger.error({ error }, 'MongoDB connection failed with unknown error');
+                    logger.error({ error: String(error) }, 'MongoDB connection failed with unknown error');
                 }
                 process.exit(1);
             }
@@ -34,8 +34,8 @@ mongoose.connection.on('disconnected', () => {
     logger.warn('MongoDB disconnected');
 });
 
-mongoose.connection.on('error', (err) => {
-    logger.error({ error: err }, 'MongoDB error');
+mongoose.connection.on('error', (err: Error) => {
+    logger.error({ error: err.message }, 'MongoDB error');
 });
 
 export const disconnectDB = async (): Promise<void> => {

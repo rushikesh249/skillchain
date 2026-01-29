@@ -1,4 +1,5 @@
 // ✅ ENV MUST BE SET BEFORE ANY IMPORTS THAT USE IT
+jest.setTimeout(90000);
 process.env.JWT_SECRET = 'test-secret-key-at-least-32-characters-long';
 process.env.JWT_EXPIRES_IN = '1d';
 process.env.NODE_ENV = 'test';

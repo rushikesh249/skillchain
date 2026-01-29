@@ -4,6 +4,7 @@ import { authMiddleware } from '../../middlewares/auth.middleware';
 import { requireRole } from '../../middlewares/role.middleware';
 import { validateQuery, validateParams } from '../../middlewares/validate.middleware';
 import { searchCandidatesSchema, unlockStudentSchema } from './employer.schema';
+import { asyncHandler } from '../../shared/utils/asyncHandler';
 
 const router = Router();
 
@@ -104,7 +105,7 @@ router.get(
     authMiddleware,
     requireRole('employer'),
     validateQuery(searchCandidatesSchema),
-    employerController.searchCandidates.bind(employerController)
+    asyncHandler(employerController.searchCandidates.bind(employerController))
 );
 
 /**
@@ -170,7 +171,7 @@ router.post(
     authMiddleware,
     requireRole('employer'),
     validateParams(unlockStudentSchema),
-    employerController.unlockStudent.bind(employerController)
+    asyncHandler(employerController.unlockStudent.bind(employerController))
 );
 
 /**
@@ -218,7 +219,7 @@ router.get(
     '/unlocks',
     authMiddleware,
     requireRole('employer'),
-    employerController.getUnlocks.bind(employerController)
+    asyncHandler(employerController.getUnlocks.bind(employerController))
 );
 
 export default router;

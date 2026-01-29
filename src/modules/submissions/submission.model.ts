@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { SubmissionStatus, VerificationReport } from '../../shared/types';
+import { VerificationReport } from '../../shared/types';
 
 export interface ISubmission extends Document {
     _id: mongoose.Types.ObjectId;

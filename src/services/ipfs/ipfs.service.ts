@@ -28,6 +28,11 @@ export interface IpfsUploadResult {
  * IPFS Service using Pinata for REAL uploads
  * NO STUB/FAKE CIDs - fails if upload fails
  */
+
+interface PinataUploadResponse {
+    IpfsHash: string;
+}
+
 export class IpfsService {
     private apiKey: string | undefined;
     private secretApiKey: string | undefined;
@@ -76,12 +81,14 @@ export class IpfsService {
                 }
             );
 
-            if (!response.data || !response.data.IpfsHash) {
-                console.error('[IPFS] ERROR: No IpfsHash in response', response.data);
+            const responseData = response.data as PinataUploadResponse;
+
+            if (!responseData || !responseData.IpfsHash) {
+                logger.error({ data: responseData }, '[IPFS] ERROR: No IpfsHash in response');
                 throw new Error('IPFS upload failed: No CID returned from Pinata');
             }
 
-            const cid = response.data.IpfsHash;
+            const cid = responseData.IpfsHash;
 
             // Validate CID format (Basic check)
             if (typeof cid !== 'string' || cid.length < 10) {
@@ -100,12 +107,11 @@ export class IpfsService {
                 metadataUrl,
             };
         } catch (error) {
-            console.error('[IPFS] Upload FAILED:', error);
             logger.error({ error }, 'Failed to upload metadata to Pinata IPFS');
 
             if (axios.isAxiosError(error)) {
-                console.error('[IPFS] Axios Error Details:', error.response?.data);
-                const message = error.response?.data?.error || error.message;
+                const errorData = error.response?.data as { error?: string } | undefined;
+                const message = errorData?.error || error.message;
                 throw new Error(`Credential issuance failed: IPFS upload unsuccessful - ${message}`);
             }
 

@@ -5,6 +5,14 @@ import { logger } from '../../shared/utils/logger';
 import contractAbi from './abi/SkillChainSBT.json';
 import crypto from 'crypto';
 
+interface BlockchainError {
+    message: string;
+    reason?: string;
+    code?: string;
+    revert?: string;
+    stack?: string;
+}
+
 export class BlockchainService {
 
     private isConfigured(): boolean {
@@ -17,7 +25,7 @@ export class BlockchainService {
         return configured;
     }
 
-    private stableStringify(obj: any): string {
+    private stableStringify(obj: unknown): string {
         if (obj === null || typeof obj !== 'object') {
             return JSON.stringify(obj);
         }
@@ -26,11 +34,12 @@ export class BlockchainService {
             return `[${obj.map((i) => this.stableStringify(i)).join(',')}]`;
         }
 
-        const keys = Object.keys(obj).sort();
-        return `{${keys.map((k) => `"${k}":${this.stableStringify(obj[k])}`).join(',')}}`;
+        const record = obj as Record<string, unknown>;
+        const keys = Object.keys(record).sort();
+        return `{${keys.map((k) => `"${k}":${this.stableStringify(record[k])}`).join(',')}}`;
     }
 
-    calculateHash(payload: any): string {
+    calculateHash(payload: unknown): string {
         const stableJson = this.stableStringify(payload);
         return crypto.createHash('sha256').update(stableJson).digest('hex');
     }
@@ -65,9 +74,10 @@ export class BlockchainService {
             try {
                 // Determine if owner() exists in ABI
                 if (contract.owner) {
-                    const owner = await contract.owner();
-                    logger.info({ owner, signer: wallet.address }, 'Contract ownership check');
-                    if (owner.toLowerCase() !== wallet.address.toLowerCase()) {
+                    const owner = await contract.owner() as string;
+                    const ownerAddress = typeof owner === 'string' ? owner : String(owner);
+                    logger.info({ owner: ownerAddress, signer: wallet.address }, 'Contract ownership check');
+                    if (ownerAddress.toLowerCase() !== wallet.address.toLowerCase()) {
                         logger.warn('Signer is NOT the contract owner. Minting might fail if onlyOwner modifier is present.');
                     }
                 }
@@ -85,14 +95,15 @@ export class BlockchainService {
                     params.ipfsCid
                 );
                 logger.info({ gas: gas.toString() }, 'Gas estimation success');
-            } catch (gasError: any) {
+            } catch (gasError) {
+                const err = gasError as BlockchainError;
                 logger.error({
-                    error: gasError,
-                    reason: gasError.reason,
-                    code: gasError.code,
-                    revert: gasError.revert
+                    error: err.message,
+                    reason: err.reason,
+                    code: err.code,
+                    revert: err.revert
                 }, 'Gas estimation FAILED');
-                throw new Error(`Gas estimation failed: ${gasError.reason || gasError.message}`);
+                throw new Error(`Gas estimation failed: ${err.reason || err.message}`);
             }
 
             // 5. Send Transaction
@@ -102,7 +113,7 @@ export class BlockchainService {
                 params.skillSlug,
                 params.score,
                 params.ipfsCid
-            );
+            ) as { hash: string; wait: () => Promise<{ status: number; hash: string }> };
             logger.info({ txHash: tx.hash }, 'Transaction sent');
 
             // 6. Wait for Receipt
@@ -112,20 +123,21 @@ export class BlockchainService {
                 throw new Error('Transaction reverted on-chain after being included in block');
             }
 
-            const txHash = receipt.hash as string;
+            const txHash = receipt.hash;
             logger.info({ txHash, params }, 'Credential successfully minted on blockchain');
 
             return txHash;
 
-        } catch (error: any) {
+        } catch (error) {
+            const err = error as BlockchainError;
             logger.error({
-                error: error.message,
-                stack: error.stack,
-                reason: error.reason
+                error: err.message,
+                stack: err.stack,
+                reason: err.reason
             }, 'CRITICAL: Failed to mint on blockchain');
 
             // NO FALLBACK - We must return the real error
-            throw new Error(`Blockchain minting failed: ${error.message}`);
+            throw new Error(`Blockchain minting failed: ${err.message}`);
         }
     }
 

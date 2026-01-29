@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { verifyController } from './verify.controller';
+import { asyncHandler } from '../../shared/utils/asyncHandler';
 
 const router = Router();
 
@@ -77,6 +78,6 @@ const router = Router();
  *       404:
  *         description: Credential not found
  */
-router.get('/:credentialId', verifyController.verifyCredential.bind(verifyController));
+router.get('/:credentialId', asyncHandler(verifyController.verifyCredential.bind(verifyController)));
 
 export default router;

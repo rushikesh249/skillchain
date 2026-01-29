@@ -46,7 +46,7 @@ const startServer = async (): Promise<void> => {
     }
 };
 
-startServer().catch((error) => {
-    logger.error({ error }, 'Unhandled error during startup');
+startServer().catch((error: unknown) => {
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Unhandled error during startup');
     process.exit(1);
 });

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { credentialController } from './credential.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 import { requireRole } from '../../middlewares/role.middleware';
+import { asyncHandler } from '../../shared/utils/asyncHandler';
 
 const router = Router();
 
@@ -39,7 +40,7 @@ router.get(
     '/my',
     authMiddleware,
     requireRole('student'),
-    credentialController.getMyCredentials.bind(credentialController)
+    asyncHandler(credentialController.getMyCredentials.bind(credentialController))
 );
 
 export default router;

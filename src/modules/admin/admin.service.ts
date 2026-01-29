@@ -10,10 +10,9 @@ import { AppError, NotFoundError } from '../../shared/errors/AppError';
 import { ISubmission } from '../submissions/submission.model';
 import { logger } from '../../shared/utils/logger';
 
-const CONFIDENCE_THRESHOLD = 70;
 
-interface PopulatedDocument {
-    _id: string;
+interface PopulatedField {
+    _id: mongoose.Types.ObjectId;
 }
 
 export class AdminService {
@@ -34,19 +33,23 @@ export class AdminService {
         // 1. Fetch related data
 
         // Handle populated fields safely
-        const studentId = (submission.studentId as any)._id
-            ? (submission.studentId as any)._id.toString()
-            : submission.studentId.toString();
+        const studentField = submission.studentId as mongoose.Types.ObjectId | PopulatedField;
+        const isStudentPopulated = typeof studentField === 'object' && studentField !== null && '_id' in studentField;
+        const studentId = isStudentPopulated
+            ? (studentField as PopulatedField)._id.toString()
+            : (studentField as mongoose.Types.ObjectId).toString();
 
-        const skillId = (submission.skillId as any)._id
-            ? (submission.skillId as any)._id.toString()
-            : submission.skillId.toString();
+        const skillField = submission.skillId as mongoose.Types.ObjectId | PopulatedField;
+        const isSkillPopulated = typeof skillField === 'object' && skillField !== null && '_id' in skillField;
+        const skillId = isSkillPopulated
+            ? (skillField as PopulatedField)._id.toString()
+            : (skillField as mongoose.Types.ObjectId).toString();
 
         const student = await userRepository.findById(studentId);
         const skill = await skillRepository.findById(skillId);
 
         if (!student || !skill) {
-            console.error(`[DEBUG] NotFound: Student (${studentId}) or Skill (${skillId}) missing.`);
+            logger.error({ studentId, skillId }, 'Student or Skill not found');
             throw new NotFoundError('Student or Skill not found');
         }
 
@@ -118,26 +121,21 @@ export class AdminService {
         }
 
         // 4. Create Credential Record
-        try {
-            // Calculate Hash (Integrity Layer)
-            // Calculate Hash (Integrity Layer)
-            // We hash the exact metadata object that was uploaded to IPFS
-            const certificateHash = blockchainService.calculateHash(nftMetadata);
+        // Calculate Hash (Integrity Layer)
+        // We hash the exact metadata object that was uploaded to IPFS
+        const certificateHash = blockchainService.calculateHash(nftMetadata);
 
-            await credentialRepository.create({
-                studentId: studentId,
-                skillId: skillId,
-                // submissionId: submission._id.toString(), // Removed as per repo signature
-                ipfsCid,
-                ipfsUrl,
-                blockchainTxHash: txHash,
-                credentialId: credentialId, // ✅ Use the same ID we generated earlier
-                score: submission.confidenceScore,
-                certificateHash,
-            });
-        } catch (dbError) {
-            throw dbError;
-        }
+        await credentialRepository.create({
+            studentId: studentId,
+            skillId: skillId,
+            // submissionId: submission._id.toString(), // Removed as per repo signature
+            ipfsCid,
+            ipfsUrl,
+            blockchainTxHash: txHash,
+            credentialId: credentialId, // ✅ Use the same ID we generated earlier
+            score: submission.confidenceScore,
+            certificateHash,
+        });
 
         // 5. Update Submission
         submission.status = 'approved';

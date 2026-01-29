@@ -14,19 +14,19 @@ export const validate = (schemas: ValidateOptions) => {
             if (schemas.body) {
                 const result = schemas.body.safeParse(req.body);
                 if (!result.success) throw result.error;
-                req.body = result.data;
+                req.body = result.data as unknown;
             }
 
             if (schemas.query) {
                 const result = schemas.query.safeParse(req.query);
                 if (!result.success) throw result.error;
-                req.query = result.data;
+                req.query = result.data as unknown as Request['query'];
             }
 
             if (schemas.params) {
                 const result = schemas.params.safeParse(req.params);
                 if (!result.success) throw result.error;
-                req.params = result.data;
+                req.params = result.data as unknown as Request['params'];
             }
 
             next();
