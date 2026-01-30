@@ -1,304 +1,117 @@
-# SkillChain Backend
+# 🔗 SkillChain
 
-> Blockchain Verified Micro-Credentials for Skills-Based Hiring
+![SkillChain Hero Banner](file:///C:/Users/rushikesh/.gemini/antigravity/brain/4f65676b-e361-4c29-906c-84a9ae5c5fe6/skillchain_hero_banner_1769789184294.png)
 
-A production-grade TypeScript/Express.js backend for a Web3 platform that enables students to earn blockchain-verified credentials through project-based assessments.
+> **Decentralized, Verified, and Unstoppable Micro-Credentials.**
 
-## 🌟 Features
+SkillChain is a next-generation Web3 platform that transforms project-based achievements into soulbound tokens (SBTs). By bridging GitHub contributions with on-chain verification, we provide a trustless layer for skills-based hiring.
 
-- **Student Submissions**: Submit GitHub repos for skill verification
-- **GitHub Verification Engine**: Automated repo analysis with confidence scoring
-- **IPFS Integration**: Certificate storage on decentralized storage
-- **Blockchain Minting**: SBT (Soulbound Token) credential issuance
-- **Employer Search**: Search and unlock verified candidate profiles
-- **Admin Dashboard**: Approve/reject submissions pipeline
+---
 
-## 📁 Project Structure
+## 🏗 System Architecture
 
+The SkillChain ecosystem coordinates automated analysis, decentralized storage, and blockchain finality to ensure credential integrity.
+
+```mermaid
+graph TD
+    subgraph "Phase 1: Validation"
+        Student[🎓 Student] -->|Submit Repo| API[🚀 Express API]
+        API -->|Analyze| GH[🛡 GitHub Engine]
+        GH -->|Score| API
+    end
+
+    subgraph "Phase 2: Decentralization"
+        API -->|Approve| IPFS[📦 IPFS/Pinata]
+        IPFS -->|Return CID| API
+        API -->|Mint SBT| Chain[⛓ Blockchain]
+    end
+
+    subgraph "Phase 3: Utility"
+        API -->|Search| Employer[💼 Employer]
+        Employer -->|Unlock| Profile[🔐 Candidate Profile]
+        API -->|Verify| Public[🔎 Public Verifier]
+    end
+
+    classDef student fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef api fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
+    classDef storage fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    classDef utility fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px;
+
+    class Student student;
+    class API api;
+    class IPFS,Chain storage;
+    class Employer,Public utility;
 ```
-rift/
-├── src/
-│   ├── config/           # Environment, database, swagger
-│   ├── middlewares/      # Auth, validation, error handling
-│   ├── modules/
-│   │   ├── auth/         # Registration, login, JWT
-│   │   ├── skills/       # Skill catalog
-│   │   ├── submissions/  # Student submissions
-│   │   ├── credentials/  # Issued credentials
-│   │   ├── employer/     # Search, unlock profiles
-│   │   ├── admin/        # Approve/reject submissions
-│   │   ├── verify/       # Public credential verification
-│   │   └── user/         # User model and repository
-│   ├── services/
-│   │   ├── github/       # GitHub API verification
-│   │   ├── ipfs/         # IPFS upload service
-│   │   └── blockchain/   # SBT minting service
-│   ├── shared/           # Errors, utils, types
-│   ├── app.ts            # Express app setup
-│   └── server.ts         # Server entry point
-├── tests/                # Jest test suites
-├── scripts/              # Seed scripts
-├── Dockerfile
-├── docker-compose.yml
-└── .github/workflows/    # CI/CD
-```
 
-## 🚀 Quick Start
+---
 
-### Prerequisites
+## ✨ Core Pillars
 
-- Node.js 20+
-- MongoDB (local or Atlas)
-- npm or yarn
+### 🛡 Verifiable Integrity
+Every credential is backed by a SHA-256 hash of its metadata, stored on IPFS, and timestamped on the blockchain. No more fake certificates.
 
-### Installation
+### 🌐 Decentralized Identity
+Credentials are issued as **Soulbound Tokens (SBTs)**. They are non-transferable, permanent records of achievement tied to the student's digital identity.
 
+### 💼 Career Accelerator
+Employers use advanced filters to find candidates with proven skills. Our "Unlock" mechanism ensures that profile views are intentional and value-driven.
+
+---
+
+## 🛠 Technology Stack
+
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
+![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=Ethereum&logoColor=white)
+![IPFS](https://img.shields.io/badge/IPFS-65C2CB?style=for-the-badge&logo=ipfs&logoColor=white)
+
+---
+
+## 🚀 Quick Launch
+
+### Backend
 ```bash
-# Clone repository
-git clone <repo-url>
-cd rift
-
-# Install dependencies
+# 1. Install & Setup
 npm install
-
-# Copy environment file
 cp .env.example .env
 
-# Edit .env with your values
-```
-
-### Environment Setup
-
-Edit `.env` file:
-
-```env
-PORT=3000
-NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/skillchain
-JWT_SECRET=your-super-secret-jwt-key-at-least-32-chars
-JWT_EXPIRES_IN=7d
-CORS_ORIGINS=http://localhost:3000,http://localhost:5173
-
-# Optional - for enhanced features
-GITHUB_TOKEN=your-github-personal-access-token
-IPFS_TOKEN=your-web3storage-token
-RPC_URL=https://sepolia.infura.io/v3/your-key
-ISSUER_PRIVATE_KEY=your-wallet-private-key
-CONTRACT_ADDRESS=0x...
-```
-
-### Running Locally
-
-```bash
-# Start MongoDB (if using Docker)
-docker-compose up mongo -d
-
-# Seed database
+# 2. Initialize
 npm run seed
 
-# Start development server
+# 3. Launch
 npm run dev
 ```
 
-Server starts at: `http://localhost:3000`
-
-### Using Docker
-
-```bash
-# Start all services (API + MongoDB + Mongo Express)
-docker-compose up -d
-
-# View logs
-docker-compose logs -f api
-
-# Stop services
-docker-compose down
-```
-
-## 💻 Frontend Setup
-
-### Installation
-
+### Frontend
 ```bash
 cd frontend
 npm install
-cp .env.example .env
-```
-
-### Configuration
-
-1. Copy the example environment file:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Edit `frontend/.env` to set your API URL:
-   ```env
-   # Development
-   VITE_API_BASE_URL=http://localhost:3000/api
-
-   # Production
-   VITE_API_BASE_URL=https://your-backend.onrender.com/api
-   ```
-
-### Running Locally
-
-```bash
 npm run dev
 ```
 
-Frontend starts at: `http://localhost:5173`
+---
 
 ## 📖 API Documentation
 
-### Swagger UI
+The platform features a fully documented REST API with Swagger UI integration.
 
-Access interactive documentation at: **http://localhost:3000/api-docs**
+**Standard Host:** `http://localhost:3000/api-docs`
 
-### API Endpoints
+| Feature | Endpoint | Capability |
+| :--- | :--- | :--- |
+| **Auth** | `/api/auth` | JWT-based Secure Identity |
+| **Verify** | `/api/verify` | Trustless Credential Validation |
+| **Employer** | `/api/employer`| Talent Discovery & Profile Unlocks |
+| **Skills** | `/api/skills` | Standardized Skill Catalog |
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/api/auth/register` | Register user | - |
-| `POST` | `/api/auth/login` | Login | - |
-| `GET` | `/api/auth/me` | Get current user | ✅ |
-| `GET` | `/api/skills` | List all skills | - |
-| `POST` | `/api/submissions` | Create submission | Student |
-| `GET` | `/api/submissions/my` | My submissions | Student |
-| `GET` | `/api/credentials/my` | My credentials | Student |
-| `GET` | `/api/employer/search` | Search candidates | Employer |
-| `POST` | `/api/employer/unlock/:id` | Unlock profile | Employer |
-| `GET` | `/api/employer/unlocks` | My unlocks | Employer |
-| `GET` | `/api/admin/submissions/pending` | Pending submissions | Admin |
-| `POST` | `/api/admin/submissions/:id/approve` | Approve submission | Admin |
-| `POST` | `/api/admin/submissions/:id/reject` | Reject submission | Admin |
-| `GET` | `/api/verify/:credentialId` | Verify credential | - |
-| `GET` | `/api/health` | Health check | - |
+---
 
-## 🧪 Testing
+## 🤝 Contributing & License
 
-```bash
-# Run all tests
-npm test
+SkillChain is built with ❤️ for the developer community. Distributed under the **MIT License**.
 
-# Run with coverage
-npm run test:coverage
+> [!TIP]
+> Use the `/api/health` endpoint to monitor system status in real-time.
 
-# Run specific test file
-npm test -- tests/auth.test.ts
-```
-
-## 📦 Sample Curl Commands
-
-### Register Student
-
-```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "John Developer",
-    "email": "john@example.com",
-    "password": "Password123",
-    "role": "student",
-    "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f1234D"
-  }'
-```
-
-### Login
-
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "john@example.com",
-    "password": "Password123"
-  }'
-```
-
-### Create Submission (Student)
-
-```bash
-curl -X POST http://localhost:3000/api/submissions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "skillId": "<skill-id>",
-    "githubRepoUrl": "https://github.com/username/repo",
-    "demoUrl": "https://myapp.vercel.app"
-  }'
-```
-
-### Search Candidates (Employer)
-
-```bash
-curl "http://localhost:3000/api/employer/search?skillSlug=react&minScore=70&page=1&limit=10" \
-  -H "Authorization: Bearer <employer-token>"
-```
-
-### Approve Submission (Admin)
-
-```bash
-curl -X POST http://localhost:3000/api/admin/submissions/<submission-id>/approve \
-  -H "Authorization: Bearer <admin-token>"
-```
-
-### Verify Credential (Public)
-
-```bash
-curl http://localhost:3000/api/verify/<credential-uuid>
-```
-
-## 🔐 Seed Credentials
-
-After running `npm run seed`:
-
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@skillchain.io | Admin@123456 |
-| Employer | employer@testcorp.com | Employer@123 |
-| Student | student@example.com | Student@123 |
-
-## 🚢 Deployment
-
-### Render/Railway
-
-1. Create new Web Service
-2. Connect GitHub repository
-3. Set build command: `npm install && npm run build`
-4. Set start command: `npm start`
-5. Add environment variables from `.env.example`
-6. Set `NODE_ENV=production`
-
-### Environment Variables Required
-
-```
-PORT=3000
-NODE_ENV=production
-MONGODB_URI=<mongodb-atlas-uri>
-JWT_SECRET=<production-secret-min-32-chars>
-JWT_EXPIRES_IN=7d
-CORS_ORIGINS=https://your-frontend.com
-```
-
-### Health Check
-
-Configure health check endpoint: `/api/health`
-
-## 🛠 Tech Stack
-
-- **Runtime**: Node.js 20+
-- **Language**: TypeScript (strict mode)
-- **Framework**: Express.js
-- **Database**: MongoDB + Mongoose
-- **Validation**: Zod
-- **Auth**: JWT + bcrypt
-- **Security**: Helmet, CORS, rate-limit
-- **Logging**: Pino
-- **Documentation**: Swagger
-- **Testing**: Jest + Supertest
-- **CI/CD**: GitHub Actions
-- **Container**: Docker
-
-## 📋 License
-
-MIT
