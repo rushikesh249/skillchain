@@ -38,6 +38,7 @@ jest.mock('../src/services/ipfs/ipfs.service', () => ({
 jest.mock('../src/services/blockchain/blockchain.service', () => ({
     blockchainService: {
         mintCredential: jest.fn().mockResolvedValue('demo_tx_hash_mock_123'),
+        calculateHash: jest.fn().mockReturnValue('mocked_certificate_hash_admin'),
     },
 }));
 

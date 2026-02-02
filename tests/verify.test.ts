@@ -50,6 +50,7 @@ describe('Verify Module', () => {
             ipfsUrl: 'https://w3s.link/ipfs/bafybeimockedcid',
             blockchainTxHash: 'demo_tx_hash_verify',
             credentialId,
+            certificateHash: 'mocked_certificate_hash',
         });
     });
 
@@ -124,6 +125,7 @@ describe('Employer Module', () => {
             ipfsUrl: 'https://w3s.link/ipfs/bafybeimockedcidsearch',
             blockchainTxHash: 'demo_tx_hash_search',
             credentialId,
+            certificateHash: 'mocked_certificate_hash_search',
         });
     });
 
