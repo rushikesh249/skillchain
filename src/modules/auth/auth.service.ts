@@ -15,7 +15,7 @@ export class AuthService {
         };
 
         const options: jwt.SignOptions = {
-            expiresIn: env.JWT_EXPIRES_IN as any, // Cast to any to satisfy the complex StringValue union from 'ms' library
+            expiresIn: env.JWT_EXPIRES_IN as unknown as jwt.SignOptions['expiresIn'],
         };
 
         return jwt.sign(payload as object, env.JWT_SECRET, options);
