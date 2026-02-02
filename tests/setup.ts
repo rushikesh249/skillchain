@@ -6,6 +6,8 @@ process.env.NODE_ENV = 'test';
 process.env.PORT = '3001';
 process.env.CORS_ORIGINS = 'http://localhost:3000';
 process.env.MONGODB_URI = 'mongodb://localhost:27017/test';
+process.env.PINATA_API_KEY = 'test-pinata-api-key';
+process.env.PINATA_SECRET_API_KEY = 'test-pinata-secret-key';
 
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
