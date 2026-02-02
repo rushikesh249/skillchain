@@ -21,9 +21,24 @@ beforeAll(async () => {
         return;
     }
 
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri);
+    try {
+        mongoServer = await MongoMemoryServer.create({
+            binary: {
+                version: '5.0.22', // Use a highly stable version
+            },
+        });
+    } catch (err) {
+        console.error('Failed to start MongoMemoryServer:', err);
+        // Fallback or exit? If in test, we want to know why
+        if (process.env.NODE_ENV === 'test') {
+            console.warn('Attempting to continue without MongoMemoryServer (expect database failures)');
+        }
+    }
+
+    if (mongoServer) {
+        const mongoUri = mongoServer.getUri();
+        await mongoose.connect(mongoUri);
+    }
 });
 
 afterAll(async () => {

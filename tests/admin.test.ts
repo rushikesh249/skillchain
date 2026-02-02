@@ -28,9 +28,16 @@ jest.mock('../src/services/github/github.service', () => ({
 
 jest.mock('../src/services/ipfs/ipfs.service', () => ({
     ipfsService: {
-        uploadCertificate: jest.fn().mockResolvedValue({
+        isConfigured: jest.fn().mockReturnValue(true),
+        uploadMetadata: jest.fn().mockResolvedValue({
             cid: 'bafybeimockedcid123',
             url: 'https://w3s.link/ipfs/bafybeimockedcid123',
+            metadataUrl: 'ipfs://bafybeimockedcid123',
+        }),
+        buildCredentialMetadata: jest.fn().mockReturnValue({
+            name: 'React Credential',
+            description: 'Mocked description',
+            attributes: [],
         }),
     },
 }));

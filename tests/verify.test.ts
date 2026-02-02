@@ -8,16 +8,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 jest.mock('../src/services/ipfs/ipfs.service', () => ({
     ipfsService: {
-        fetchCertificate: jest.fn().mockResolvedValue({
-            credentialId: 'test-cred-id',
-            studentName: 'Test Student',
-            studentEmail: 'student@test.com',
-            skillName: 'Python',
-            githubRepoUrl: 'https://github.com/test/repo',
-            confidenceScore: 85,
-            flags: [],
-            issuedAt: new Date().toISOString(),
-            issuer: 'SkillChain',
+        fetchMetadata: jest.fn().mockResolvedValue({
+            name: 'Python Credential',
+            description: 'Mocked description',
+            issuer: 'SkillChain', // Added for test compatibility
+            attributes: [
+                { trait_type: 'Issuer', value: 'SkillChain' },
+                { trait_type: 'Credential ID', value: 'test-cred-id' }
+            ]
         }),
     },
 }));
