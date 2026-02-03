@@ -28,37 +28,36 @@ jobs:
         run: npm run lint
 
   test:
-    name: Test
     runs-on: ubuntu-latest
-    needs: lint
+
+    services:
+      mongo:
+        image: mongo:6
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      CI: true
+      MONGODB_URI: mongodb://localhost:27017/skillchain_test
+      JWT_SECRET: testsecret
+      JWT_EXPIRES_IN: 1h
+      PINATA_API_KEY: test
+      PINATA_SECRET_API_KEY: test
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: 20
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test
-        env:
-          NODE_ENV: test
-          JWT_SECRET: test-secret-key-at-least-32-characters-long
-          JWT_EXPIRES_IN: 1d
-          MONGODB_URI: mongodb://localhost:27017/test
-          CORS_ORIGINS: http://localhost:3000
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage/lcov.info
-          fail_ci_if_error: false
+      - run: npm install
+      - run: npm run build --if-present
+      - run: npm test
 
   build:
     name: Build

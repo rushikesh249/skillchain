@@ -21,23 +21,27 @@ beforeAll(async () => {
         return;
     }
 
+    if (process.env.CI === "true") {
+        // In GitHub Actions, connect to service MongoDB instead of MongoMemoryServer
+        const mongoUri = process.env.MONGODB_URI as string;
+        await mongoose.connect(mongoUri);
+        return;
+    }
+
     try {
         mongoServer = await MongoMemoryServer.create({
             binary: {
                 version: '5.0.22', // Use a highly stable version
             },
         });
+        const mongoUri = mongoServer.getUri();
+        await mongoose.connect(mongoUri);
     } catch (err) {
         console.error('Failed to start MongoMemoryServer:', err);
         // Fallback or exit? If in test, we want to know why
         if (process.env.NODE_ENV === 'test') {
             console.warn('Attempting to continue without MongoMemoryServer (expect database failures)');
         }
-    }
-
-    if (mongoServer) {
-        const mongoUri = mongoServer.getUri();
-        await mongoose.connect(mongoUri);
     }
 });
 
