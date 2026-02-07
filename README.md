@@ -1,6 +1,6 @@
 # 🔗 SkillChain
 
-![SkillChain Hero Banner](file:///C:/Users/rushikesh/.gemini/antigravity/brain/4f65676b-e361-4c29-906c-84a9ae5c5fe6/skillchain_hero_banner_1769789184294.png)
+![SkillChain Hero Banner](assets/hero-banner.png)
 
 > **Decentralized, Verified, and Unstoppable Micro-Credentials.**
 
