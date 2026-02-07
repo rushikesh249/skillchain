@@ -83,6 +83,7 @@ Companies can discover candidates based on verified skills. The "Unlock Profile"
 
 | Component | Tech | Role |
 | :--- | :--- | :--- |
+| **Frontend** | ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white) ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) | Modern UI with React 19 & Tailwind |
 | **Backend** | ![NodeJS](https://img.shields.io/badge/Node.js-green?style=flat-square) ![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat-square) | Core Business Logic & API |
 | **Database** | ![MongoDB](https://img.shields.io/badge/MongoDB-green?style=flat-square) | User Data & Off-chain Indexing |
 | **Blockchain** | ![Ethereum](https://img.shields.io/badge/Ethereum-gray?style=flat-square) ![Ethers.js](https://img.shields.io/badge/Ethers.js-blue?style=flat-square) | Smart Contract Interaction |
