@@ -5,8 +5,9 @@
 </p>
 
 <p align="center">
-  <a href="#-core-features">Features</a> •
+  <a href="#-project-overview">Overview</a> •
   <a href="#-system-architecture">Architecture</a> •
+  <a href="#-features">Features</a> •
   <a href="#-technology-stack">Tech Stack</a> •
   <a href="#-getting-started">Getting Started</a> •
   <a href="#-api-documentation">API</a>
@@ -14,29 +15,17 @@
 
 ---
 
-> **🏆 Hackathon Submission: Decentralized, Verified, and Unstoppable Micro-Credentials.**
+## 📝 Project Overview
 
-**SkillChain** bridges the gap between **Web2 development** and **Web3 identity**. We transform verifiable GitHub contributions into **Soulbound Tokens (SBTs)**, creating an immutable, tamper-proof resume that developers own forever.
+**SkillChain** is a Web3 platform designed to bridge the gap between verified developer skills and decentralized identity. It transforms GitHub contributions into **Soulbound Tokens (SBTs)**, creating an immutable, on-chain record of achievement.
 
----
-
-## 💡 The Problem
-In the current hiring landscape:
-*   **Resume Fraud**: 55% of resumes contain exaggerations or lies.
-*   **Platform Lock-in**: Your reputation is stuck on LinkedIn or Upwork.
-*   **Verification Costs**: Employers spend billions annually on background checks.
-
-## 🚀 The Solution: SkillChain
-We built a trustless verification engine that:
-1.  **Analyzes** code directly from the source (GitHub).
-2.  **Mints** a permanent proof of skill as a Soulbound Token (SBT) on the blockchain.
-3.  **Stores** metadata on IPFS for decentralized, censorship-resistant access.
+By combining automated code analysis with blockchain verification, the platform provides a trustless mechanism for issuing and validating micro-credentials.
 
 ---
 
 ## 🏗 System Architecture
 
-The SkillChain ecosystem coordinates automated analysis, decentralized storage, and blockchain finality to ensure credential integrity.
+The SkillChain ecosystem coordinates automated analysis, decentralized storage (IPFS), and blockchain finality to ensure credential integrity.
 
 ```mermaid
 graph TD
@@ -71,23 +60,22 @@ graph TD
 
 ---
 
-## 🔥 Technical Highlights (Why this wins)
+## ✨ Features
 
-### 1. Cryptographic Integrity
-We don't just store data; we seal it. Every credential includes a **SHA-256 hash** of its metadata.
-- **Tamper-Proof**: If the IPFS data changes, the hash on-chain won't match.
-- **Trustless**: Verifiers don't need to trust us, just the math.
+### 🛡 Cryptographic Verification
+Every issued credential includes a SHA-256 hash of its metadata. This ensures that the data stored on IPFS matches the on-chain proof, preventing tampering.
 
-### 2. Hybrid Web3 Architecture
-We solve the "Blockchain Bloat" problem by using **IPFS for data** and **Blockchain for proofs**.
-- **Cost**: Gas fees are minimized by storing only the `CID` and `Hash` on-chain.
-- **Speed**: Metadata retrieval is instant via IPFS gateways.
+### 🌐 Soulbound Identity
+Credentials are issued as **Soulbound Tokens (SBTs)**. These tokens are non-transferable and permanently bound to the recipient's wallet address, serving as a reliable proof of skill ownership.
 
-### 3. Automated Quality Gate
-Our GitHub Engine doesn't just check for existence. It analyzes:
-- **Repo Age & Activity**: Prevents "day-old" fake repos.
-- **Language Detection**: Ensures the code matches the claimed skill.
-- **Contribution History**: Verifies active ownership.
+### 🔍 Automated Quality Analysis
+The backend engine analyzes GitHub repositories directly to verify:
+- Repository activity and contribution history.
+- Language composition and consistency.
+- Code quality metrics (via static analysis).
+
+### 💼 Employer Dashboard
+Companies can discover candidates based on verified skills. The "Unlock Profile" mechanism respects candidate privacy while facilitating direct connections.
 
 ---
 
@@ -131,11 +119,18 @@ npm run seed
 npm run dev
 ```
 
+### Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
 ---
 
 ## 📖 API Documentation
 
-The platform features a fully documented REST API. Access Swagger UI at `http://localhost:3000/api-docs`.
+The platform features a fully documented REST API. Access Swagger UI at `http://localhost:3000/api-docs` when running locally.
 
 | Endpoint | Functionality |
 | :--- | :--- |
@@ -146,15 +141,15 @@ The platform features a fully documented REST API. Access Swagger UI at `http://
 
 ---
 
-## 🔮 Future Roadmap
+## 🔮 Roadmap
 
 - [ ] **Multi-Chain Support**: Expand to Polygon and Solana for lower gas fees.
-- [ ] **AI Code Review**: Integrate LLMs to analyze code quality, not just metadata.
-- [ ] **Zero-Knowledge Proofs (ZK)**: Allow students to prove skills without revealing their identity.
+- [ ] **AI Code Review**: Integrate LLMs for deeper code quality analysis.
+- [ ] **Zero-Knowledge Proofs (ZK)**: Allow students to prove skills without revealing their full identity.
 
 ---
 
 ## 🤝 Contributing & License
 
-SkillChain is built with ❤️ for the developer community. Distributed under the **MIT License**.
+This project is open-source and available under the **MIT License**. Contributions are welcome!
 
