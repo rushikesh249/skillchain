@@ -1,10 +1,36 @@
 # 🔗 SkillChain
 
-![SkillChain Hero Banner](assets/hero-banner.png)
+<p align="center">
+  <img src="assets/hero-banner.png" alt="SkillChain Hero Banner" width="100%" style="border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+</p>
 
-> **Decentralized, Verified, and Unstoppable Micro-Credentials.**
+<p align="center">
+  <a href="#-core-features">Features</a> •
+  <a href="#-system-architecture">Architecture</a> •
+  <a href="#-technology-stack">Tech Stack</a> •
+  <a href="#-getting-started">Getting Started</a> •
+  <a href="#-api-documentation">API</a>
+</p>
 
-SkillChain is a next-generation Web3 platform that transforms project-based achievements into soulbound tokens (SBTs). By bridging GitHub contributions with on-chain verification, we provide a trustless layer for skills-based hiring.
+---
+
+> **🏆 Hackathon Submission: Decentralized, Verified, and Unstoppable Micro-Credentials.**
+
+**SkillChain** bridges the gap between **Web2 development** and **Web3 identity**. We transform verifiable GitHub contributions into **Soulbound Tokens (SBTs)**, creating an immutable, tamper-proof resume that developers own forever.
+
+---
+
+## 💡 The Problem
+In the current hiring landscape:
+*   **Resume Fraud**: 55% of resumes contain exaggerations or lies.
+*   **Platform Lock-in**: Your reputation is stuck on LinkedIn or Upwork.
+*   **Verification Costs**: Employers spend billions annually on background checks.
+
+## 🚀 The Solution: SkillChain
+We built a trustless verification engine that:
+1.  **Analyzes** code directly from the source (GitHub).
+2.  **Mints** a permanent proof of skill as a Soulbound Token (SBT) on the blockchain.
+3.  **Stores** metadata on IPFS for decentralized, censorship-resistant access.
 
 ---
 
@@ -14,22 +40,22 @@ The SkillChain ecosystem coordinates automated analysis, decentralized storage, 
 
 ```mermaid
 graph TD
-    subgraph "Phase 1: Validation"
+    subgraph "Phase 1: Validation Layer"
         Student[🎓 Student] -->|Submit Repo| API[🚀 Express API]
-        API -->|Analyze| GH[🛡 GitHub Engine]
-        GH -->|Score| API
+        API -->|Deep Analysis| GH[🛡 GitHub Engine]
+        GH -->|Score & Validate| API
     end
 
-    subgraph "Phase 2: Decentralization"
-        API -->|Approve| IPFS[📦 IPFS/Pinata]
+    subgraph "Phase 2: Decentralization Layer"
+        API -->|Upload Metadata| IPFS[📦 IPFS/Pinata]
         IPFS -->|Return CID| API
-        API -->|Mint SBT| Chain[⛓ Blockchain]
+        API -->|Mint Soulbound Token| Chain[⛓ Blockchain]
     end
 
-    subgraph "Phase 3: Utility"
+    subgraph "Phase 3: Verification Layer"
         API -->|Search| Employer[💼 Employer]
         Employer -->|Unlock| Profile[🔐 Candidate Profile]
-        API -->|Verify| Public[🔎 Public Verifier]
+        API -->|Verify Hash| Public[🔎 Public Verifier]
     end
 
     classDef student fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
@@ -45,49 +71,63 @@ graph TD
 
 ---
 
-## ✨ Core Pillars
+## 🔥 Technical Highlights (Why this wins)
 
-### 🛡 Verifiable Integrity
-Every credential is backed by a SHA-256 hash of its metadata, stored on IPFS, and timestamped on the blockchain. No more fake certificates.
+### 1. Cryptographic Integrity
+We don't just store data; we seal it. Every credential includes a **SHA-256 hash** of its metadata.
+- **Tamper-Proof**: If the IPFS data changes, the hash on-chain won't match.
+- **Trustless**: Verifiers don't need to trust us, just the math.
 
-### 🌐 Decentralized Identity
-Credentials are issued as **Soulbound Tokens (SBTs)**. They are non-transferable, permanent records of achievement tied to the student's digital identity.
+### 2. Hybrid Web3 Architecture
+We solve the "Blockchain Bloat" problem by using **IPFS for data** and **Blockchain for proofs**.
+- **Cost**: Gas fees are minimized by storing only the `CID` and `Hash` on-chain.
+- **Speed**: Metadata retrieval is instant via IPFS gateways.
 
-### 💼 Career Accelerator
-Employers use advanced filters to find candidates with proven skills. Our "Unlock" mechanism ensures that profile views are intentional and value-driven.
+### 3. Automated Quality Gate
+Our GitHub Engine doesn't just check for existence. It analyzes:
+- **Repo Age & Activity**: Prevents "day-old" fake repos.
+- **Language Detection**: Ensures the code matches the claimed skill.
+- **Contribution History**: Verifies active ownership.
 
 ---
 
 ## 🛠 Technology Stack
 
-![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
-![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
-![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=Ethereum&logoColor=white)
-![IPFS](https://img.shields.io/badge/IPFS-65C2CB?style=for-the-badge&logo=ipfs&logoColor=white)
+| Component | Tech | Role |
+| :--- | :--- | :--- |
+| **Backend** | ![NodeJS](https://img.shields.io/badge/Node.js-green?style=flat-square) ![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat-square) | Core Business Logic & API |
+| **Database** | ![MongoDB](https://img.shields.io/badge/MongoDB-green?style=flat-square) | User Data & Off-chain Indexing |
+| **Blockchain** | ![Ethereum](https://img.shields.io/badge/Ethereum-gray?style=flat-square) ![Ethers.js](https://img.shields.io/badge/Ethers.js-blue?style=flat-square) | Smart Contract Interaction |
+| **Storage** | ![IPFS](https://img.shields.io/badge/IPFS-teal?style=flat-square) ![Pinata](https://img.shields.io/badge/Pinata-purple?style=flat-square) | Decentralized Metadata Storage |
+| **Infrastructure** | ![Docker](https://img.shields.io/badge/Docker-blue?style=flat-square) ![Jest](https://img.shields.io/badge/Jest-red?style=flat-square) | Containerization & Testing |
 
 ---
 
-## 🚀 Quick Launch
+## 🚀 Getting Started
 
-### Backend
+### Prerequisites
+- Node.js v18+
+- MongoDB (Running locally or Atlas)
+- Pinata Account (for IPFS)
+
+### Installation
+
 ```bash
-# 1. Install & Setup
-npm install
-cp .env.example .env
+# 1. Clone the repo
+git clone https://github.com/rushikesh249/skillchain.git
+cd skillchain
 
-# 2. Initialize
+# 2. Install dependencies
+npm install
+
+# 3. Configure Environment
+cp .env.example .env
+# Fill in your MONGODB_URI and PINATA keys
+
+# 4. Initialize Database
 npm run seed
 
-# 3. Launch
-npm run dev
-```
-
-### Frontend
-```bash
-cd frontend
-npm install
+# 5. Start Development Server
 npm run dev
 ```
 
@@ -95,23 +135,26 @@ npm run dev
 
 ## 📖 API Documentation
 
-The platform features a fully documented REST API with Swagger UI integration.
+The platform features a fully documented REST API. Access Swagger UI at `http://localhost:3000/api-docs`.
 
-**Standard Host:** `http://localhost:3000/api-docs`
+| Endpoint | Functionality |
+| :--- | :--- |
+| **POST** `/api/auth/register` | User Registration (Student/Employer) |
+| **POST** `/api/submissions` | Submit GitHub Repo for Analysis |
+| **GET** `/api/verify/:id` | Verify Credential Validity |
+| **POST** `/api/admin/approve` | Mint SBT (Admin Only) |
 
-| Feature | Endpoint | Capability |
-| :--- | :--- | :--- |
-| **Auth** | `/api/auth` | JWT-based Secure Identity |
-| **Verify** | `/api/verify` | Trustless Credential Validation |
-| **Employer** | `/api/employer`| Talent Discovery & Profile Unlocks |
-| **Skills** | `/api/skills` | Standardized Skill Catalog |
+---
+
+## 🔮 Future Roadmap
+
+- [ ] **Multi-Chain Support**: Expand to Polygon and Solana for lower gas fees.
+- [ ] **AI Code Review**: Integrate LLMs to analyze code quality, not just metadata.
+- [ ] **Zero-Knowledge Proofs (ZK)**: Allow students to prove skills without revealing their identity.
 
 ---
 
 ## 🤝 Contributing & License
 
 SkillChain is built with ❤️ for the developer community. Distributed under the **MIT License**.
-
-> [!TIP]
-> Use the `/api/health` endpoint to monitor system status in real-time.
 
