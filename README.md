@@ -26,7 +26,21 @@ By leveraging Algorand as an **immutable trust layer**, SkillChain ensures that 
 
 ## 🏗 High-Level Architecture
 
-**Student** → **Backend API** → **IPFS (Metadata Storage)** → **Algorand TestNet (Hash Anchor)** → **Verification Portal**
+```mermaid
+graph TD
+    Student([🎓 Student]) -->|GitHub Repo| API[⚙️ Backend API]
+    API -->|1. Validate & Hash| IPFS[📦 IPFS]
+    IPFS -.->|CID| API
+    API -->|2. Mint/Anchor| Algo[⛓️ Algorand TestNet]
+    Public([🌍 Public Verifier]) -.->|3. Verify Hash| Algo
+    Public -.->|4. Fetch Metadata| IPFS
+    
+    style Student fill:#f9f,stroke:#333,stroke-width:2px
+    style API fill:#bbf,stroke:#333,stroke-width:2px
+    style IPFS fill:#bfb,stroke:#333,stroke-width:2px
+    style Algo fill:#fbf,stroke:#333,stroke-width:2px
+    style Public fill:#fff,stroke:#333,stroke-width:2px
+```
 
 ---
 
