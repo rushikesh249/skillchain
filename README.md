@@ -27,19 +27,27 @@ By leveraging Algorand as an **immutable trust layer**, SkillChain ensures that 
 ## 🏗 High-Level Architecture
 
 ```mermaid
-graph TD
-    Student([🎓 Student]) -->|GitHub Repo| API[⚙️ Backend API]
-    API -->|1. Validate & Hash| IPFS[📦 IPFS]
-    IPFS -.->|CID| API
-    API -->|2. Mint/Anchor| Algo[⛓️ Algorand TestNet]
-    Public([🌍 Public Verifier]) -.->|3. Verify Hash| Algo
-    Public -.->|4. Fetch Metadata| IPFS
+graph LR
+    %% Styles
+    classDef actor fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef core fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff;
+    classDef storage fill:#16a34a,stroke:#15803d,stroke-width:2px,color:#ffffff;
+    classDef blockchain fill:#9333ea,stroke:#7e22ce,stroke-width:2px,color:#ffffff;
     
-    style Student fill:#f9f,stroke:#333,stroke-width:2px
-    style API fill:#bbf,stroke:#333,stroke-width:2px
-    style IPFS fill:#bfb,stroke:#333,stroke-width:2px
-    style Algo fill:#fbf,stroke:#333,stroke-width:2px
-    style Public fill:#fff,stroke:#333,stroke-width:2px
+    %% Nodes
+    Student([🎓 Student]):::actor
+    API[⚙️ SkillChain API]:::core
+    IPFS[📦 IPFS Storage]:::storage
+    Algo[⛓️ Algorand TestNet]:::blockchain
+    Verifier([🌍 Public Verifier]):::actor
+
+    %% Flow
+    Student -->|1. Submit Repo| API
+    API -->|2. Validate & Hash| IPFS
+    IPFS -.->|CID| API
+    API -->|3. Anchor Hash| Algo
+    Verifier -.->|4. Verify Proof| Algo
+    Verifier -.->|5. Fetch Metadata| IPFS
 ```
 
 ---
