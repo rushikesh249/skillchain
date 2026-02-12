@@ -1,67 +1,65 @@
 # 🔗 SkillChain
-### AI-Powered Blockchain Credential System on Algorand TestNet
+### AI-Powered Blockchain Credential System on Algorand
 
-> **Turning skills into verifiable digital assets.**
-
----
-
-## 🚨 Problem
-
-Campus certification and skill validation systems suffer from:
-
-- ❌ **Centralized trust dependency**
-- ❌ **Easily forgeable certificates**
-- ❌ **No cryptographic proof**
-- ❌ **Slow, manual employer verification**
-- ❌ **Lack of auditability**
-
-In skills-based hiring, **trust is the bottleneck**.
-
-Traditional systems rely on authority.  
-**SkillChain replaces authority with cryptographic proof.**
+> **Turning verified skills into immutable, publicly verifiable digital assets.**
 
 ---
 
-## 💡 Solution
+## 🚨 The Problem
 
-SkillChain is a blockchain-backed credential platform that anchors verified skill records on **Algorand TestNet**.
+Campus and skill certification systems today:
 
-### How It Works
+- ❌ **Rely on centralized trust**
+- ❌ **Allow modification or deletion of records**
+- ❌ **Provide no cryptographic proof**
+- ❌ **Require manual employer verification**
+- ❌ **Lack transparency and auditability**
 
-1. 🎓 **Student** submits skill proof (GitHub project)
-2. 🛡 **Admin** validates submission
-3. 🔐 **Credential metadata** is generated
-4. 🧮 **SHA-256 hash** of metadata is created
-5. 📦 **Certificate JSON** stored on **IPFS** (decentralized storage)
-6. ⛓ **Hash anchored** on **Algorand TestNet**
-7. 🔎 **Public verification** compares hash integrity
-
-> **If metadata is altered → hash mismatch → credential invalid.**  
-> **No trust required. Only math.**
+In skills-based hiring, **trust is the bottleneck.**
 
 ---
 
-## ⛓ Why Algorand
+## 💡 Our Solution
 
-SkillChain uses **Algorand TestNet** as its immutable trust layer because:
+SkillChain is a blockchain-backed credential platform that:
 
-- ⚡ **Instant finality** (no rollback risk)
-- 💰 **Extremely low transaction fees**
-- 🌱 **Energy-efficient Pure Proof-of-Stake**
-- 🧾 **Designed for digital assets & identity systems**
-- 🔐 **Secure and scalable for institutional adoption**
+- ✅ **Validates skill submissions**
+- ✅ **Generates certificate metadata**
+- ✅ **Stores certificate JSON on IPFS**
+- ✅ **Anchors cryptographic hash on Algorand TestNet**
+- ✅ **Enables public, trustless verification**
 
-**Algorand acts as the single source of truth for credential integrity.**
+> **If any certificate data changes → Hash mismatch → Credential invalid.**  
+> **Verification does not depend on authority. It depends on mathematics.**
 
 ---
 
-## 🏗 High-Level Architecture
+## ⛓ Blockchain Layer (Algorand Integration)
 
-**Student** → **API** → **Validation** → **SHA-256 Hash**  
+SkillChain uses **Algorand TestNet** as an immutable trust layer.
+
+### What We Implemented
+- 🧮 **SHA-256 deterministic hashing** of certificate metadata
+- 🔗 **Hash anchoring workflow** to blockchain layer
+- 🧾 **Immutable transaction reference** stored with credential
+- 🔍 **Public verification endpoint** validating integrity
+- 🚫 **Tamper detection logic** (recalculate & compare hash)
+
+**Algorand ensures:**
+- ⚡ **Instant finality**
+- 💰 **Low transaction cost**
+- 🌱 **Energy-efficient validation**
+- 🌍 **Public verifiability**
+
+---
+
+## 🏗 Architecture Overview
+
+**Student** → **Validation API** → **SHA-256 Hash**  
 ↓  
 **IPFS** (Decentralized Storage)  
 ↓  
-**Algorand TestNet** (Immutable Anchor)  
+**Algorand Blockchain** (Immutable Anchor)  
 ↓  
 **Public Verification Portal**
 
@@ -75,11 +73,11 @@ graph LR
     
     %% Nodes
     Student([🎓 Student]):::actor
-    API[⚙️ API & Validation]:::core
+    API[⚙️ Validation API]:::core
     Hash(🧮 SHA-256 Hash):::core
     IPFS[📦 IPFS Storage]:::storage
-    Algo[⛓️ Algorand TestNet]:::blockchain
-    Verifier([🌍 Public Verification]):::actor
+    Algo[⛓️ Algorand Ledger]:::blockchain
+    Verifier([🌍 Public Oracle]):::actor
 
     %% Flow
     Student -->|Submit| API
@@ -95,7 +93,7 @@ Off-chain for scalability. On-chain for immutability. **Zero-trust verification 
 
 ---
 
-## 🛠 Technology Stack
+## 🛠 Tech Stack
 
 ### **Frontend**
 - **React + Vite**
@@ -103,73 +101,88 @@ Off-chain for scalability. On-chain for immutability. **Zero-trust verification 
 
 ### **Backend**
 - **Node.js + TypeScript**
-- **Express REST API**
-- Role-based access control
+- **Express REST APIs**
+- Role-based authentication
 
-### **Data & Storage**
+### **Storage & Data**
 - **MongoDB** (metadata indexing)
-- **IPFS via Pinata** (decentralized certificate storage)
+- **IPFS via Pinata** (certificate storage)
 
 ### **Blockchain**
 - **Algorand TestNet**
 - SHA-256 cryptographic hashing
-- On-chain hash anchoring
+- Immutable hash anchoring
 
 ### **Infrastructure**
-- Dockerized environment
-- Jest test suite
+- Dockerized setup
+- Jest automated test suite
+- Modular service architecture
 
 ---
 
-## ✨ Key Features
+## ✅ What Is Fully Implemented
 
-- 🔐 **Tamper-proof credential validation**
-- 🌍 **Public verification endpoint**
-- 🧮 **Deterministic hash integrity layer**
-- 👥 **Role-based workflows** (Student / Admin / Employer)
-- 📦 **Decentralized metadata storage**
-- ⛓ **Blockchain-backed trust model**
+- [x] Student submission workflow
+- [x] Admin approval pipeline
+- [x] Certificate JSON generation
+- [x] IPFS storage integration
+- [x] Deterministic SHA-256 hashing
+- [x] Integrity verification logic
+- [x] Public verification endpoint
+- [x] Role-based system (Student / Admin / Employer)
+- [x] Tamper detection system
+- [x] Clean API documentation
+
+---
+
+## 🚧 What Is In Progress / Future Scope
+
+- [ ] Smart contract automation layer on Algorand
+- [ ] Direct wallet-based credential ownership
+- [ ] Full on-chain NFT/SBT minting
+- [ ] AI-based automated skill scoring
+- [ ] Cross-campus credential portability
+
+---
+
+## 📂 Key Files Judges May Review
+
+To understand the core blockchain logic, please see:
+
+- `src/services/blockchain/` → **Hashing & anchoring logic**
+- `src/modules/verify/verify.service.ts` → **Integrity validation**
+- `src/modules/admin/admin.service.ts` → **Credential issuance pipeline**
+- `src/services/ipfs/` → **Decentralized storage integration**
+- `tests/integrity.test.ts` → **Deterministic hash verification tests**
+
+> **These files demonstrate:**  
+> Cryptographic integrity logic • Blockchain anchoring flow • Tamper-proof validation design
+
+---
+
+## 🔎 Public Verification Example
+
+**GET** `/api/verify/:credentialId`
+
+**Returns:**
+- `valid`
+- `hashMatch`
+- `certificateHash`
+- `ipfsCid`
+- `blockchain reference`
+
+> **Any mismatch automatically invalidates the credential.**
 
 ---
 
 ## 🌍 Impact
 
 SkillChain enables:
-
-- **Fraud-resistant certification**
-- **Instant recruiter validation**
-- **Transparent audit trail**
-- **Reduced institutional dependency**
-- **Scalable campus credential systems**
-
-Built for:
-🎓 **Universities** | 🏫 **Campus platforms** | 💼 **Recruiters** | 🌐 **Skills-based ecosystems**
-
----
-
-## 🚀 Verification Example
-
-**Public verification endpoint:**
-`GET /api/verify/:credentialId`
-
-**Returns:**
-- `valid` → Credential existence
-- `hashMatch` → Integrity status
-- `certificateHash`
-- `ipfsCid`
-- `Blockchain transaction reference`
-
-> Any mismatch automatically invalidates the credential.
-
----
-
-## 🔮 Future Scope
-
-- [ ] Smart contract automation on Algorand
-- [ ] Wallet-based ownership
-- [ ] On-chain SBT minting
-- [ ] AI-powered skill validation
-- [ ] Cross-campus credential portability
+- **Fraud-resistant digital credentials**
+- **Instant recruiter verification**
+- **Transparent audit trails**
+- **Scalable campus blockchain infrastructure**
+- **Trustless credential validation**
 
 ---
 
@@ -178,10 +191,10 @@ Built for:
 We believe credentials should be:
 **Immutable • Publicly verifiable • Cryptographically secured • Independent of centralized trust**
 
-SkillChain transforms skills into **mathematically provable digital assets.**
+SkillChain transforms skills into **verifiable digital assets.**
 
 ---
 
-## 🏷 Team
+## 👥 Team
 
 **ChainAI Labs**
