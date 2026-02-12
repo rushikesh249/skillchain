@@ -1,30 +1,69 @@
 # 🔗 SkillChain
-### Tamper-Proof, Blockchain-Backed Skill Credentials
+### AI-Powered Blockchain Credential System on Algorand TestNet
+
+> **Turning skills into verifiable digital assets.**
 
 ---
 
-## 🚨 Problem Statement
-**Resume fraud is rampant.** Fake certificates and unverifiable skills cost employers billions annually. Traditional verification is slow, centralized, and prone to manipulation.
+## 🚨 Problem
 
-In a global talent market, **trust is the bottleneck.**
+Campus certification and skill validation systems suffer from:
+
+- ❌ **Centralized trust dependency**
+- ❌ **Easily forgeable certificates**
+- ❌ **No cryptographic proof**
+- ❌ **Slow, manual employer verification**
+- ❌ **Lack of auditability**
+
+In skills-based hiring, **trust is the bottleneck**.
+
+Traditional systems rely on authority.  
+**SkillChain replaces authority with cryptographic proof.**
 
 ---
 
-## 💡 Solution Overview
-**SkillChain** bridges the trust gap by anchoring verified skill credentials on the **Algorand TestNet**.
+## 💡 Solution
 
-1. **Submission**: Students submit GitHub repositories demonstrating their skills.
-2. **Validation**: Credentials undergo automated analysis and admin validation.
-3. **Hashing**: A secure **SHA-256 hash** of the credential metadata is generated.
-4. **Decentralized Storage**: Credential JSON metadata is pinned to **IPFS** via Pinata for permanent accessibility.
-5. **Blockchain Anchor**: The unique hash is committed to the **Algorand TestNet**, creating an immutable, timestamped proof of authenticity.
-6. **Public Verification**: Anyone can instantly verify the integrity of a credential against the blockchain record.
+SkillChain is a blockchain-backed credential platform that anchors verified skill records on **Algorand TestNet**.
 
-By leveraging Algorand as an **immutable trust layer**, SkillChain ensures that credentials are mathematically provable and impossible to forge.
+### How It Works
+
+1. 🎓 **Student** submits skill proof (GitHub project)
+2. 🛡 **Admin** validates submission
+3. 🔐 **Credential metadata** is generated
+4. 🧮 **SHA-256 hash** of metadata is created
+5. 📦 **Certificate JSON** stored on **IPFS** (decentralized storage)
+6. ⛓ **Hash anchored** on **Algorand TestNet**
+7. 🔎 **Public verification** compares hash integrity
+
+> **If metadata is altered → hash mismatch → credential invalid.**  
+> **No trust required. Only math.**
+
+---
+
+## ⛓ Why Algorand
+
+SkillChain uses **Algorand TestNet** as its immutable trust layer because:
+
+- ⚡ **Instant finality** (no rollback risk)
+- 💰 **Extremely low transaction fees**
+- 🌱 **Energy-efficient Pure Proof-of-Stake**
+- 🧾 **Designed for digital assets & identity systems**
+- 🔐 **Secure and scalable for institutional adoption**
+
+**Algorand acts as the single source of truth for credential integrity.**
 
 ---
 
 ## 🏗 High-Level Architecture
+
+**Student** → **API** → **Validation** → **SHA-256 Hash**  
+↓  
+**IPFS** (Decentralized Storage)  
+↓  
+**Algorand TestNet** (Immutable Anchor)  
+↓  
+**Public Verification Portal**
 
 ```mermaid
 graph LR
@@ -36,92 +75,113 @@ graph LR
     
     %% Nodes
     Student([🎓 Student]):::actor
-    API[⚙️ SkillChain API]:::core
+    API[⚙️ API & Validation]:::core
+    Hash(🧮 SHA-256 Hash):::core
     IPFS[📦 IPFS Storage]:::storage
     Algo[⛓️ Algorand TestNet]:::blockchain
-    Verifier([🌍 Public Verifier]):::actor
+    Verifier([🌍 Public Verification]):::actor
 
     %% Flow
-    Student -->|1. Submit Repo| API
-    API -->|2. Validate & Hash| IPFS
-    IPFS -.->|CID| API
-    API -->|3. Anchor Hash| Algo
-    Verifier -.->|4. Verify Proof| Algo
-    Verifier -.->|5. Fetch Metadata| IPFS
+    Student -->|Submit| API
+    API -->|Validate| Hash
+    Hash -->|Metadata| IPFS
+    IPFS -.->|CID| Hash
+    Hash -->|Anchor| Algo
+    Verifier -.->|Verify| Algo
+    Verifier -.->|Fetch| IPFS
 ```
+
+Off-chain for scalability. On-chain for immutability. **Zero-trust verification model.**
 
 ---
 
 ## 🛠 Technology Stack
 
 ### **Frontend**
-- **React + Vite**: High-performance, reactive UI.
-- **Tailwind CSS**: Modern, responsive styling.
+- **React + Vite**
+- **Tailwind CSS**
 
 ### **Backend**
-- **Node.js + TypeScript**: Type-safe, scalable server logic.
-- **Express**: Robust API framework.
+- **Node.js + TypeScript**
+- **Express REST API**
+- Role-based access control
 
 ### **Data & Storage**
-- **MongoDB**: Fast off-chain indexing and user management.
-- **IPFS (Pinata)**: Decentralized, content-addressed storage for credential metadata.
+- **MongoDB** (metadata indexing)
+- **IPFS via Pinata** (decentralized certificate storage)
 
 ### **Blockchain**
-- **Algorand TestNet**: Core infrastructure for **Credential Hash Anchoring** and **Immutable Verification**. Chosen for its speed, low cost, and finality.
+- **Algorand TestNet**
+- SHA-256 cryptographic hashing
+- On-chain hash anchoring
 
 ### **Infrastructure**
-- **Docker**: Containerized deployment.
-- **Jest**: Rigorous testing suite.
+- Dockerized environment
+- Jest test suite
 
 ---
 
 ## ✨ Key Features
-- **Tamper-Proof Integrity**: Any alteration to the credential metadata invalidates the on-chain hash match.
-- **Trustless Verification**: A public endpoint allows anyone to validate credentials without relying on the issuer's server.
-- **Role-Based Access Control**: Secure workflows for Students, Admins, and Employers.
-- **Decentralized Metadata**: Credential data lives on IPFS, ensuring availability and censorship resistance.
+
+- 🔐 **Tamper-proof credential validation**
+- 🌍 **Public verification endpoint**
+- 🧮 **Deterministic hash integrity layer**
+- 👥 **Role-based workflows** (Student / Admin / Employer)
+- 📦 **Decentralized metadata storage**
+- ⛓ **Blockchain-backed trust model**
 
 ---
 
 ## 🌍 Impact
-- **Eliminates Certificate Fraud**: Makes fake credentials mathematically impossible.
-- **Instant Employer Validation**: Reduces verification time from weeks to seconds.
-- **Reduces Centralized Dependency**: Shifts trust from institutions to cryptographic proofs.
-- **Scalable Architecture**: Built on Algorand to handle high-throughput credential issuance for campuses and institutions.
-- **Practical Web3 Integration**: Demonstrates a real-world use case for blockchain beyond financial speculation.
+
+SkillChain enables:
+
+- **Fraud-resistant certification**
+- **Instant recruiter validation**
+- **Transparent audit trail**
+- **Reduced institutional dependency**
+- **Scalable campus credential systems**
+
+Built for:
+🎓 **Universities** | 🏫 **Campus platforms** | 💼 **Recruiters** | 🌐 **Skills-based ecosystems**
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Verification Example
 
-### Prerequisites
-- Node.js v18+
-- MongoDB (Local or Atlas)
-- Pinata API Keys (Free Tier)
-- Algorand TestNet Account
+**Public verification endpoint:**
+`GET /api/verify/:credentialId`
 
-### Installation
+**Returns:**
+- `valid` → Credential existence
+- `hashMatch` → Integrity status
+- `certificateHash`
+- `ipfsCid`
+- `Blockchain transaction reference`
 
-```bash
-# 1. Clone the repo
-git clone https://github.com/rushikesh249/skillchain.git
-cd skillchain
-
-# 2. Install dependencies
-npm install
-
-# 3. Configure Environment
-cp .env.example .env
-# Fill in: PORT, MONGO_URI, PINATA_JWT, ALGO_TESTNET info
-
-# 4. Start Development Server
-npm run dev
-```
-
-### Verification
-Visit `http://localhost:3000/verify/:id` with a valid credential ID to see the blockchain verification in action.
+> Any mismatch automatically invalidates the credential.
 
 ---
 
-## 🤝 License
-This project is open-source and available under the **MIT License**.
+## 🔮 Future Scope
+
+- [ ] Smart contract automation on Algorand
+- [ ] Wallet-based ownership
+- [ ] On-chain SBT minting
+- [ ] AI-powered skill validation
+- [ ] Cross-campus credential portability
+
+---
+
+## 🧠 Vision
+
+We believe credentials should be:
+**Immutable • Publicly verifiable • Cryptographically secured • Independent of centralized trust**
+
+SkillChain transforms skills into **mathematically provable digital assets.**
+
+---
+
+## 🏷 Team
+
+**ChainAI Labs**
